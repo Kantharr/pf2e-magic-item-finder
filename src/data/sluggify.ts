@@ -1,9 +1,7 @@
 /**
- * TypeScript twin of the C# `Sluggify` (and of PF2e's own default `sluggify`).
- * Used by the coverage report to derive a live item's slug from its name when the
- * compendium index doesn't carry `system.slug`, so the slug fallback join can
- * never silently no-op. Keep this in lockstep with
- * `src/Pf2eItemFinder.Core/Tagging/Sluggify.cs`.
+ * Faithful port of PF2e's own default `sluggify`. Used by the coverage report to
+ * derive a live item's slug from its name when the compendium index doesn't carry
+ * `system.slug`, so the slug fallback join can never silently no-op.
  */
 
 // camelCase / PascalCase boundary -> hyphen, before lowercasing.

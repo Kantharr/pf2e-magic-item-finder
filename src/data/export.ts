@@ -1,8 +1,7 @@
 import type { IndexedItem } from "./item-index.js";
 
 /**
- * Phase 6 — export the current result set to CSV or JSON, mirroring the desktop
- * `CsvExporter` (see `src/Pf2eItemFinder.Core/Data/CsvExporter.cs`). Pure string
+ * Phase 6 — export the current result set to CSV or JSON. Pure string
  * builders here (unit-testable, Foundry-free); the browser download side-effect
  * lives in {@link triggerDownload} and the `download*` helpers.
  *
@@ -42,7 +41,7 @@ export function buildExportRows(items: readonly IndexedItem[]): ExportRow[] {
 }
 
 /** Plain numeric gp (no thousands separators) so spreadsheets parse it as a
- * number; blank for a priceless item. Mirrors the desktop `FormatPrice`. */
+ * number; blank for a priceless item. */
 function formatPrice(priceGp: number | null): string {
   if (priceGp == null) return "";
   // Trim to at most 3 decimals, dropping trailing zeros (matches "0.###").

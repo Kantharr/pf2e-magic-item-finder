@@ -123,7 +123,7 @@ interface RawIndexEntry {
 
 /**
  * Collapse Foundry's multi-denomination price into a single gp-equivalent,
- * mirroring the desktop `PriceNormalizer`: `pp*10 + gp + sp/10 + cp/100`.
+ * as `pp*10 + gp + sp/10 + cp/100`.
  * An absent or empty (`{}`) price object → `null` (priceless), distinct from a
  * price whose denominations happen to sum to 0.
  */

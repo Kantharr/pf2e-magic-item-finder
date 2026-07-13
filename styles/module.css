@@ -9,7 +9,7 @@
    ========================================================================== */
 
 .pf2e-magic-item-finder {
-  /* Rarity accent hues (desktop parity: common neutral / uncommon green /
+  /* Rarity accent hues (common neutral / uncommon green /
      rare blue / unique pink). Used for dots, row tints, and rarity chips. */
   --rarity-common: #9aa1ab;
   --rarity-uncommon: #2e9e4f;

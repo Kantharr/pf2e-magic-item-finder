@@ -2,3 +2,8 @@ node_modules/
 dist/
 release/
 *.log
+
+# Internal build notes — not shipped in the published module repo
+phases/
+docs/
+TODO.md

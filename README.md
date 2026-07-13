@@ -6,18 +6,17 @@ full-text description search, level/rarity/trait/price filters, saved presets, a
 CSV/JSON export.
 
 It reads the **live** `pf2e.equipment-srd` compendium for item data and joins it to
-a **bundled, pre-computed ability-tag map** authored by the C# desktop tool in the
-parent repo. The result is the one thing the PF2e system's native Compendium
-Browser can't do: *"show me every item that lets a character fly / heal an ally /
-teleport."*
+a **bundled, pre-computed ability-tag map**. The result is the one thing the PF2e
+system's native Compendium Browser can't do: *"show me every item that lets a
+character fly / heal an ally / teleport."*
 
 ## Requirements
 
 - FoundryVTT **v12+** (verified on v12)
 - Pathfinder Second Edition system **v6.0.0+** (verified on v6.9.0)
 
-No .NET runtime, installer, or bundled database — Foundry supplies the parsed item
-data and one-click, auto-updating installs.
+No installer, runtime, or bundled database to manage — Foundry supplies the parsed
+item data and one-click, auto-updating installs.
 
 ## Install
 
@@ -81,31 +80,18 @@ tag map is re-exported (see below).
 
 ## Refreshing the tag map (maintainer workflow)
 
-When the PF2e system ships item changes and the bundled tags drift, re-export:
+The bundled `data/ability-tags.json` is a pre-computed map generated offline by a
+separate tagging pipeline (not part of this repo). When the PF2e system ships item
+changes and the bundled tags drift:
 
-1. Update the PF2e system clone / seed data the desktop tool reads.
-2. Re-run the C# exporter (`AbilityTagExporter`) against the refreshed data — via
-   the WPF **"Export tags (JSON)…"** button, the `--export-ability-tags` headless
-   CLI, or the Core API. It emits `ability-tags.json`
-   (`{ uuid → { slug, name, tags, snippets, matchMethod } }` + header + tag
-   dictionary).
-3. Replace [`data/ability-tags.json`](data/ability-tags.json) with the new export.
-4. Bump the header's `pf2eSystemVersion` to the system version you exported from,
+1. Regenerate `ability-tags.json` from the refreshed PF2e data. It maps each item
+   UUID → `{ slug, name, tags, snippets, matchMethod }`, plus a header and the
+   tag-category dictionary (`schemaVersion` + `pf2eSystemVersion`).
+2. Replace [`data/ability-tags.json`](data/ability-tags.json) with the new export.
+3. Bump the header's `pf2eSystemVersion` to the system version you exported from,
    and — if the item set changed enough to re-test — bump `module.json`'s
    `version`, `compatibility.verified`, and `relationships.systems` pf2e `verified`.
-5. Cut a new release (below). Re-check the coverage report in a live world.
-
-## Relationship to the desktop app
-
-This module is the **Foundry-native consumer**; it is *not* a rewrite of the C#
-desktop app. The two split responsibilities:
-
-- **C# desktop tool = the tag-authoring pipeline.** Its `AbilityTaggingService`
-  and the `ability-tags.json` dictionary produce the tag data. That's where tagging
-  logic is maintained.
-- **This module = the consumer.** It ships the pre-computed tag map and joins it to
-  the live PF2e compendium at runtime, sidestepping every distribution problem the
-  desktop app hit (no installer, no code signing, no bundled DB, no resync).
+4. Cut a new release (below). Re-check the coverage report in a live world.
 
 ## Build
 
@@ -156,7 +142,7 @@ foundry-module/            # = the module repo root
   module.json              # manifest (copied into dist/)
   src/                     # TypeScript source (module.ts entry, apps/, data/, search/)
   templates/  styles/  lang/   # copied into dist/
-  data/ability-tags.json   # bundled pre-computed tag map (from the C# exporter)
+  data/ability-tags.json   # bundled pre-computed tag map (generated offline)
   .github/workflows/       # release CI
   vite.config.ts  tsconfig.json  vitest.config.ts  package.json
   dist/                    # build output = the installable module (gitignored)

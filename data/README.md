@@ -33,13 +33,8 @@ the installed system triggers a drift warning.
 
 ## Regenerating
 
-This file is produced by the C# desktop app's exporter from the tagged SQLite DB —
-**do not hand-edit it.** Regenerate on any PF2e data refresh (Phase 7):
-
-```
-Pf2eItemFinder.App.exe --export-ability-tags <items.db> foundry-module/data/ability-tags.json 8.3.0
-```
-
-or use the app's **"Export tags (JSON)…"** button. Then `npm run build` (or `deploy`)
-to ship it in `dist/`. Bump the trailing version argument when the source system
-version changes.
+This file is a pre-computed export generated offline by a separate tagging
+pipeline — **do not hand-edit it.** On a PF2e data refresh, regenerate the export,
+replace `ability-tags.json` here, and bump the `pf2eSystemVersion` header to the
+system version it was built against. Then `npm run build` (or `deploy`) to ship it
+in `dist/`.

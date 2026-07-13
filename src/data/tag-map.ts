@@ -2,15 +2,15 @@ import { MODULE_ID } from "../constants.js";
 
 /**
  * Runtime shape of the bundled ability-tag map (`dist/data/ability-tags.json`),
- * produced by the C# `AbilityTagExporter`. Keep {@link TAG_MAP_SCHEMA_VERSION} in
- * lockstep with the exporter's `SchemaVersion`.
+ * a pre-computed data artifact generated offline. Keep {@link TAG_MAP_SCHEMA_VERSION}
+ * in lockstep with the map's `schemaVersion` header.
  */
 export const TAG_MAP_SCHEMA_VERSION = 1;
 
 /** Module-relative path the map is fetched from at `ready`. */
 export const TAG_MAP_PATH = `modules/${MODULE_ID}/data/ability-tags.json`;
 
-/** How a tag was matched to an item (mirrors the desktop tagger). */
+/** How a tag was matched to an item. */
 export type MatchMethod = "structured" | "regex";
 
 /** One item's tag data, keyed in {@link TagMap.tags} by its compendium UUID. */

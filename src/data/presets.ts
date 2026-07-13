@@ -2,8 +2,7 @@ import { MODULE_ID } from "../constants.js";
 import type { FilterOptionLists, FilterState, SortDir, SortField } from "../search/query-engine.js";
 
 /**
- * Phase 6 — named filter presets, the Foundry-native mirror of the desktop
- * `FilterPresetService` (see `src/Pf2eItemFinder.Core/Data/FilterPresetService.cs`).
+ * Phase 6 — named filter presets.
  *
  * Presets live in a **client-scoped** `game.settings` value (per-user, per-world,
  * survives reloads) rather than a SQLite table. The filter state is serialized
@@ -52,8 +51,7 @@ function sameName(a: string, b: string): boolean {
   return a.localeCompare(b, undefined, { sensitivity: "base" }) === 0;
 }
 
-/** All presets, ordered by name (case-insensitive) — mirrors the desktop's
- * `ORDER BY name COLLATE NOCASE`. */
+/** All presets, ordered by name (case-insensitive). */
 export function listPresets(): StoredPreset[] {
   return [...read()].sort((a, b) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
@@ -89,7 +87,7 @@ function sanitizeState(state: FilterState): FilterState {
 
 /**
  * Insert a new preset or overwrite the existing one with the same name
- * (case-insensitive upsert, mirroring the desktop `ON CONFLICT(name)`). A
+ * (case-insensitive upsert). A
  * re-save keeps the original `createdAt`. The name is trimmed; a blank name
  * throws. Returns the stored preset.
  */
@@ -115,9 +113,8 @@ export async function savePreset(name: string, state: FilterState): Promise<Stor
 
 /**
  * Rename a preset. Throws on a blank new name, if the source doesn't exist, or
- * if the new name collides with a *different* preset (case-insensitive) —
- * mirroring the desktop's UNIQUE-constraint behavior. Renaming to the same name
- * (case change only) is allowed.
+ * if the new name collides with a *different* preset (case-insensitive).
+ * Renaming to the same name (case change only) is allowed.
  */
 export async function renamePreset(oldName: string, newName: string): Promise<void> {
   const trimmed = (newName ?? "").trim();

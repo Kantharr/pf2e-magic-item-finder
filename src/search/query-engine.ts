@@ -4,7 +4,7 @@ import type { IndexedItem, ItemIndex } from "../data/item-index.js";
 /**
  * Phase 4 — the pure, UI-agnostic search/filter engine over the Phase 3 item
  * model. It combines the headline ability-tag filter with the supporting
- * structured filters and MiniSearch full-text, using the desktop app's exact
+ * structured filters and MiniSearch full-text, with these
  * combination semantics: **AND across categories, OR within a multi-select**,
  * with the free-text candidate set AND-intersected onto the structured result.
  *
@@ -19,8 +19,7 @@ export type SortField = "name" | "level" | "price" | "relevance";
 export type SortDir = "asc" | "desc";
 
 /** The composed filter state for a single query. Every field is optional; an
- * all-empty state matches the full magical list. Mirrors the desktop
- * `ItemQuery` (see `src/Pf2eItemFinder.Core/Data/ItemQuery.cs`). */
+ * all-empty state matches the full magical list. */
 export interface FilterState {
   /** Free-text query (name + description). Blank = no text filter. */
   text?: string;
@@ -38,7 +37,7 @@ export interface FilterState {
   maxPriceGp?: number | null;
   /**
    * When a price bound is set, priceless (null-price) items are excluded by
-   * default (mirrors the desktop's `price_gp >= ?` NULL semantics). Set this to
+   * default. Set this to
    * keep them in the result regardless of the numeric bounds.
    */
   includePriceless?: boolean;
@@ -102,7 +101,7 @@ export interface SearchEngineOptions {
   descriptions?: Record<string, string>;
 }
 
-/** Canonical PF2e rarity order (rarest last), mirroring the desktop. */
+/** Canonical PF2e rarity order (rarest last). */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
 
 /** MiniSearch document shape (one per indexed item). */
@@ -309,8 +308,8 @@ function buildTextIndex(
   const mini = new MiniSearch<TextDoc>({
     idField: "id",
     fields: ["name", "description"],
-    // Weight name hits far above description body (mirrors the desktop BM25
-    // column weights: name 10, description 1).
+    // Weight name hits far above description body (BM25 column
+    // weights: name 10, description 1).
     searchOptions: {
       prefix: true,
       fuzzy: 0.2,
