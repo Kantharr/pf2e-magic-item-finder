@@ -38,7 +38,8 @@ name from the in-app browser.)*
 
 Open the window in an enabled PF2e world via either:
 
-- the **wand** button in the **Token** scene controls (left toolbar), or
+- the **wand** button in the **Compendium sidebar** header (right-hand sidebar →
+  Compendium Packs tab, next to the search/filter), or
 - a macro:
 
   ```js
