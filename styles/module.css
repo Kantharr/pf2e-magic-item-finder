@@ -32,6 +32,23 @@
   color: inherit;
 }
 
+/* Bold/heading text (including whatever `<strong>`/`<b>` an item's enriched
+   description happens to embed) inherits a fixed dark drop-shadow from
+   Foundry/PF2e's base styles, meant for light text on a dark or parchment
+   background. On the light UI theme our inherited text colour is dark too
+   (`--color-text-primary` flips to `--color-dark-1` under `.theme-light`), so
+   that fixed-dark shadow sits directly under dark text — a muddy blur instead
+   of a legibility aid. There's no CSS-only way to derive a *contrasting*
+   shadow from `currentColor` (no stable `contrast-color()` yet), so branch on
+   Foundry's own theme class instead: keep a soft dark shadow on the default
+   dark theme, swap to a soft light one under `.theme-light`. */
+.pf2e-magic-item-finder :is(h1, h2, h3, h4, h5, h6, strong, b) {
+  text-shadow: 0 0 2px var(--pf2e-mif-bold-shadow, rgba(0, 0, 0, 0.6));
+}
+.theme-light .pf2e-magic-item-finder {
+  --pf2e-mif-bold-shadow: rgba(255, 255, 255, 0.6);
+}
+
 /* ---- Overall layout: sidebar | results | detail -------------------------
    Under ApplicationV2's HandlebarsApplicationMixin each part template's single
    root element *is* the part element and a direct child of `.window-content`,
