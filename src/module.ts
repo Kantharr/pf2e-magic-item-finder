@@ -195,14 +195,11 @@ function rootElement(html: unknown): HTMLElement | null {
   return null;
 }
 
-// Add a button to open the window into the Compendium sidebar's header, next to
-// PF2e's filter control. `renderSidebarTab` fires for every sidebar tab render
-// (robust to PF2e swapping in its own CompendiumDirectory subclass); we filter
-// to the compendium tab and inject once. fvtt-types models render hooks per
-// app-class rather than this generic one, so cast inline (kept bound to Hooks).
-(Hooks.on as (hook: string, fn: (app: unknown, html: unknown) => void) => number)(
-  "renderSidebarTab",
-  (app: unknown, html: unknown) => {
+/**
+ * Inject a button into the Compendium sidebar's header, next to PF2e's filter
+ * control. Shared by both the v12 and v13+ render hooks below.
+ */
+function injectCompendiumButton(app: unknown, html: unknown): void {
   try {
     if (game.system?.id !== REQUIRED_SYSTEM_ID) return;
     const a = app as { tabName?: string; id?: string } | null;
@@ -210,7 +207,7 @@ function rootElement(html: unknown): HTMLElement | null {
 
     const root = rootElement(html);
     if (!root) return;
-    // Idempotent: renderSidebarTab fires on every re-render.
+    // Idempotent: both render hooks fire on every re-render.
     if (root.querySelector(`a.${MODULE_ID}-open`)) return;
 
     const headerSearch = root.querySelector<HTMLElement>(".directory-header .header-search");
@@ -235,4 +232,21 @@ function rootElement(html: unknown): HTMLElement | null {
   } catch (err) {
     console.error(`${MODULE_ID} | failed to add compendium button`, err);
   }
-});
+}
+
+// `renderSidebarTab` is the v12 (ApplicationV1) sidebar-tab render hook; PF2e's
+// CompendiumDirectory subclass fires it via the base SidebarTab class. v13+
+// rebuilt the sidebar on ApplicationV2, which does not fire `renderSidebarTab`
+// at all — instead every ApplicationV2 instance (regardless of subclass name,
+// which PF2e changes across versions) fires the generic `renderApplicationV2`
+// hook. Registering on both covers v12 through v14 without depending on a
+// specific subclass name. fvtt-types models render hooks per app-class rather
+// than these generic ones, so cast inline (kept bound to Hooks).
+(Hooks.on as (hook: string, fn: (app: unknown, html: unknown) => void) => number)(
+  "renderSidebarTab",
+  injectCompendiumButton,
+);
+(Hooks.on as (hook: string, fn: (app: unknown, html: unknown) => void) => number)(
+  "renderApplicationV2",
+  injectCompendiumButton,
+);
