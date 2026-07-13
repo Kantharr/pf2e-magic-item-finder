@@ -1,0 +1,56 @@
+<section class="pf2e-mif-detail-pane">
+  {{#if detail}}
+  <div class="pf2e-mif-detail" data-uuid="{{detail.uuid}}">
+    <header class="detail-header">
+      {{#if detail.img}}<img class="detail-img" src="{{detail.img}}" alt="" />{{/if}}
+      <div class="detail-title">
+        <h2>{{detail.name}}</h2>
+        <p class="detail-meta">
+          <span class="rarity-dot rarity-{{detail.rarity}}"></span>{{detail.meta}}
+        </p>
+      </div>
+      <button type="button" class="detail-open" data-action="openItem" data-uuid="{{detail.uuid}}"
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Detail.OpenSheet"}}">
+        <i class="fa-solid fa-up-right-from-square"></i>
+      </button>
+    </header>
+
+    {{#if detail.traits.length}}
+    <div class="detail-traits">
+      {{#each detail.traits}}<span class="trait-pill">{{this}}</span>{{/each}}
+    </div>
+    {{/if}}
+
+    {{#if detail.source}}
+    <p class="detail-source"><strong>{{localize "PF2E_MAGIC_ITEM_FINDER.Detail.Source"}}:</strong> {{detail.source}}</p>
+    {{/if}}
+
+    {{#if detail.hasTags}}
+    <section class="detail-section detail-tags">
+      <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Detail.MatchedTags"}}</h3>
+      {{#each detail.tags}}
+      <div class="detail-tag">
+        <div class="detail-tag-name">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> {{name}}
+          {{#if method}}<span class="detail-tag-method">{{method}}</span>{{/if}}
+        </div>
+        {{#if snippet}}<p class="detail-tag-snippet">{{snippet}}</p>{{/if}}
+      </div>
+      {{/each}}
+    </section>
+    {{/if}}
+
+    {{#if detail.descriptionHtml}}
+    <section class="detail-section detail-description">
+      <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Detail.Description"}}</h3>
+      <div class="detail-description-body">{{{detail.descriptionHtml}}}</div>
+    </section>
+    {{/if}}
+  </div>
+  {{else}}
+  <div class="pf2e-mif-detail-empty">
+    <i class="fa-solid fa-hand-pointer"></i>
+    <p>{{localize "PF2E_MAGIC_ITEM_FINDER.Detail.Empty"}}</p>
+  </div>
+  {{/if}}
+</section>

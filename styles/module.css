@@ -1,0 +1,618 @@
+/* ==========================================================================
+   PF2e Magic Item Finder — Phase 5 window styling.
+
+   Theme-aware by construction: text colour is inherited from Foundry's window
+   content (already correct per light/dark + PF2e theme), and surfaces/borders
+   are derived from `currentColor` via color-mix so they adapt automatically.
+   Rarity hues are fixed accents (dots + translucent row tints) that read on
+   both themes. No hard-coded page background or text colour.
+   ========================================================================== */
+
+.pf2e-magic-item-finder {
+  /* Rarity accent hues (desktop parity: common neutral / uncommon green /
+     rare blue / unique pink). Used for dots, row tints, and rarity chips. */
+  --rarity-common: #9aa1ab;
+  --rarity-uncommon: #2e9e4f;
+  --rarity-rare: #2f74d0;
+  --rarity-unique: #d05a9e;
+  /* Selection / focus accent. */
+  --pf2e-mif-accent: #4a7bd0;
+  /* Derived, theme-adaptive surfaces. */
+  --pf2e-mif-surface: color-mix(in srgb, currentColor 6%, transparent);
+  --pf2e-mif-surface-2: color-mix(in srgb, currentColor 10%, transparent);
+  --pf2e-mif-border: color-mix(in srgb, currentColor 20%, transparent);
+  --pf2e-mif-border-soft: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* ---- Overall layout: sidebar | results | detail -------------------------
+   Under ApplicationV2's HandlebarsApplicationMixin each part template's single
+   root element *is* the part element and a direct child of `.window-content`,
+   so the three named roots below are the grid tracks. */
+.pf2e-magic-item-finder .window-content {
+  display: grid;
+  /* Column widths are drag-adjustable via the splitters; JS overrides these
+     custom properties on this element. */
+  grid-template-columns:
+    var(--pf2e-mif-sidebar-w, 250px)
+    minmax(0, 1fr)
+    var(--pf2e-mif-detail-w, 330px);
+  grid-template-rows: 100%;
+  gap: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-sidebar,
+.pf2e-magic-item-finder .pf2e-mif-results-pane,
+.pf2e-magic-item-finder .pf2e-mif-detail-pane {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-loading {
+  padding: 1rem;
+  opacity: 0.7;
+}
+
+/* ---- Sidebar ------------------------------------------------------------ */
+.pf2e-magic-item-finder .pf2e-mif-sidebar {
+  grid-column: 1;
+  overflow-y: auto;
+  padding: 0.6rem 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-right: 1px solid var(--pf2e-mif-border);
+}
+
+.pf2e-magic-item-finder .pf2e-mif-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.pf2e-magic-item-finder .pf2e-mif-search i {
+  position: absolute;
+  left: 0.5rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.pf2e-magic-item-finder .pf2e-mif-search input {
+  width: 100%;
+  padding: 0.35rem 0.4rem 0.35rem 1.7rem;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-filter h3 {
+  margin: 0 0 0.4rem;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.8;
+}
+.pf2e-magic-item-finder .pf2e-mif-tags h3 {
+  font-size: 0.9rem;
+  opacity: 1;
+}
+.pf2e-magic-item-finder .pf2e-mif-tags h3 i {
+  color: var(--pf2e-mif-accent);
+}
+
+.pf2e-magic-item-finder .pf2e-mif-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+/* Bounded, user-resizable scroll box (ability tags + shared with traits feel). */
+.pf2e-magic-item-finder .pf2e-mif-scrollbox {
+  max-height: 170px;
+  min-height: 68px;
+  overflow-y: auto;
+  padding: 0.35rem;
+  border: 1px solid var(--pf2e-mif-border);
+  border-radius: 4px;
+  background: var(--pf2e-mif-surface);
+  resize: vertical;
+}
+.pf2e-magic-item-finder .pf2e-mif-tags-box,
+.pf2e-magic-item-finder .pf2e-mif-traits-box {
+  max-height: 210px;
+}
+/* Trait slugs render lower-case in data; present them title-cased on the chip. */
+.pf2e-magic-item-finder .pf2e-mif-trait-chip {
+  text-transform: capitalize;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  width: auto;
+  border: 1px solid var(--pf2e-mif-border);
+  border-radius: 999px;
+  background: var(--pf2e-mif-surface);
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.pf2e-magic-item-finder .pf2e-mif-chip:hover {
+  background: var(--pf2e-mif-surface-2);
+}
+.pf2e-magic-item-finder .pf2e-mif-chip[data-empty="true"] {
+  opacity: 0.45;
+}
+.pf2e-magic-item-finder .pf2e-mif-chip.active {
+  background: var(--pf2e-mif-accent);
+  border-color: var(--pf2e-mif-accent);
+  color: #fff;
+}
+
+/* Rarity chips: tint by hue when active. */
+.pf2e-magic-item-finder .pf2e-mif-chip.rarity-uncommon.active {
+  background: var(--rarity-uncommon);
+  border-color: var(--rarity-uncommon);
+}
+.pf2e-magic-item-finder .pf2e-mif-chip.rarity-rare.active {
+  background: var(--rarity-rare);
+  border-color: var(--rarity-rare);
+}
+.pf2e-magic-item-finder .pf2e-mif-chip.rarity-unique.active {
+  background: var(--rarity-unique);
+  border-color: var(--rarity-unique);
+}
+.pf2e-magic-item-finder .pf2e-mif-chip.rarity-common.active {
+  background: color-mix(in srgb, var(--rarity-common) 60%, transparent);
+  border-color: var(--rarity-common);
+  color: inherit;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-range {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-range input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.25rem 0.35rem;
+}
+.pf2e-magic-item-finder .range-sep {
+  opacity: 0.6;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-check {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-check input {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-hint,
+.pf2e-magic-item-finder .pf2e-mif-tags .pf2e-mif-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-sidebar-footer {
+  margin-top: auto;
+  padding-top: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-clear {
+  width: 100%;
+}
+
+/* ---- Presets ------------------------------------------------------------ */
+.pf2e-magic-item-finder .pf2e-mif-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--pf2e-mif-border-soft);
+}
+.pf2e-magic-item-finder .pf2e-mif-presets h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+.pf2e-magic-item-finder .pf2e-mif-presets select {
+  width: 100%;
+}
+.pf2e-magic-item-finder .pf2e-mif-preset-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-preset-actions button {
+  flex: 1 1 auto;
+  padding: 0.2rem 0.4rem;
+  line-height: 1.2;
+}
+/* The rename/delete icon buttons don't grow with the Save button. */
+.pf2e-magic-item-finder .pf2e-mif-preset-actions button[data-action="renamePreset"],
+.pf2e-magic-item-finder .pf2e-mif-preset-actions button[data-action="deletePreset"] {
+  flex: 0 0 auto;
+  width: auto;
+}
+.pf2e-magic-item-finder .pf2e-mif-preset-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pf2e-magic-item-finder .pf2e-mif-preset-delete:not(:disabled):hover {
+  color: var(--rarity-unique, #c0392b);
+}
+
+/* ---- Results ------------------------------------------------------------ */
+.pf2e-magic-item-finder .pf2e-mif-results-pane {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* anchor for the column splitters */
+}
+
+/* ---- Column splitters --------------------------------------------------- */
+.pf2e-magic-item-finder .pf2e-mif-splitter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  z-index: 5;
+  cursor: col-resize;
+  touch-action: none;
+}
+.pf2e-magic-item-finder .pf2e-mif-splitter-left {
+  left: -4px;
+}
+.pf2e-magic-item-finder .pf2e-mif-splitter-right {
+  right: -4px;
+}
+/* A hairline that brightens on hover/drag so the grab target is discoverable. */
+.pf2e-magic-item-finder .pf2e-mif-splitter::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: transparent;
+  transition: background 0.12s;
+}
+.pf2e-magic-item-finder .pf2e-mif-splitter:hover::after,
+body.pf2e-mif-resizing .pf2e-magic-item-finder .pf2e-mif-splitter::after {
+  background: var(--pf2e-mif-accent);
+}
+
+/* While dragging a splitter, keep the resize cursor and kill text selection. */
+body.pf2e-mif-resizing,
+body.pf2e-mif-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--pf2e-mif-border-soft);
+  font-size: 0.82rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-count {
+  opacity: 0.85;
+}
+.pf2e-magic-item-finder .pf2e-mif-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-sort label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-sort select {
+  width: auto;
+}
+.pf2e-magic-item-finder .pf2e-mif-sortdir {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.2rem 0.45rem;
+  line-height: 1;
+}
+.pf2e-magic-item-finder .pf2e-mif-export {
+  display: flex;
+  gap: 0.3rem;
+  margin-left: 0.35rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--pf2e-mif-border-soft);
+}
+.pf2e-magic-item-finder .pf2e-mif-export button {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.2rem 0.5rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-results {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  outline: none;
+}
+
+.pf2e-magic-item-finder .pf2e-mif-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) 3.2rem 5rem 5.5rem minmax(0, 2fr);
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.28rem 0.6rem;
+  border-bottom: 1px solid var(--pf2e-mif-border-soft);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  font-size: 0.84rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-row.pf2e-mif-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  cursor: default;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.75;
+  background: color-mix(in srgb, currentColor 8%, var(--color-bg-option, transparent));
+  backdrop-filter: blur(2px);
+}
+/* Give the sticky header a solid-ish backing so rows don't bleed through. */
+.pf2e-magic-item-finder .pf2e-mif-row.pf2e-mif-head {
+  background: var(--pf2e-mif-surface-2);
+}
+
+.pf2e-magic-item-finder .pf2e-mif-row:not(.pf2e-mif-head):hover {
+  background: var(--pf2e-mif-surface);
+}
+
+/* Rarity row tint + left accent (common = none). */
+.pf2e-magic-item-finder .pf2e-mif-row.rarity-uncommon {
+  border-left-color: var(--rarity-uncommon);
+  background: color-mix(in srgb, var(--rarity-uncommon) 9%, transparent);
+}
+.pf2e-magic-item-finder .pf2e-mif-row.rarity-rare {
+  border-left-color: var(--rarity-rare);
+  background: color-mix(in srgb, var(--rarity-rare) 9%, transparent);
+}
+.pf2e-magic-item-finder .pf2e-mif-row.rarity-unique {
+  border-left-color: var(--rarity-unique);
+  background: color-mix(in srgb, var(--rarity-unique) 9%, transparent);
+}
+
+.pf2e-magic-item-finder .pf2e-mif-row.selected {
+  background: color-mix(in srgb, var(--pf2e-mif-accent) 28%, transparent);
+  border-left-color: var(--pf2e-mif-accent);
+}
+
+.pf2e-magic-item-finder .col-name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.pf2e-magic-item-finder .row-img {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 3px;
+  object-fit: cover;
+}
+.pf2e-magic-item-finder .row-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pf2e-magic-item-finder .row-open {
+  margin-left: auto;
+  flex: 0 0 auto;
+  opacity: 0;
+  padding: 0 0.2rem;
+  cursor: pointer;
+}
+.pf2e-magic-item-finder .pf2e-mif-row:hover .row-open,
+.pf2e-magic-item-finder .pf2e-mif-row.selected .row-open {
+  opacity: 0.7;
+}
+.pf2e-magic-item-finder .row-open:hover {
+  opacity: 1;
+}
+
+.pf2e-magic-item-finder .col-level,
+.pf2e-magic-item-finder .col-price {
+  font-variant-numeric: tabular-nums;
+}
+.pf2e-magic-item-finder .col-rarity {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pf2e-magic-item-finder .col-traits {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.pf2e-magic-item-finder .rarity-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--rarity-common);
+}
+.pf2e-magic-item-finder .rarity-dot.rarity-uncommon { background: var(--rarity-uncommon); }
+.pf2e-magic-item-finder .rarity-dot.rarity-rare { background: var(--rarity-rare); }
+.pf2e-magic-item-finder .rarity-dot.rarity-unique { background: var(--rarity-unique); }
+
+/* ---- Detail ------------------------------------------------------------- */
+.pf2e-magic-item-finder .pf2e-mif-detail-pane {
+  grid-column: 3;
+  overflow-y: auto;
+  padding: 0.75rem;
+  border-left: 1px solid var(--pf2e-mif-border);
+}
+
+.pf2e-magic-item-finder .pf2e-mif-detail-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0.5;
+  text-align: center;
+}
+.pf2e-magic-item-finder .pf2e-mif-detail-empty i {
+  font-size: 1.6rem;
+}
+
+.pf2e-magic-item-finder .detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+.pf2e-magic-item-finder .detail-img {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 1px solid var(--pf2e-mif-border);
+  border-radius: 4px;
+  object-fit: cover;
+}
+.pf2e-magic-item-finder .detail-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.pf2e-magic-item-finder .detail-title h2 {
+  margin: 0;
+  border: none;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+.pf2e-magic-item-finder .detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.pf2e-magic-item-finder .detail-open {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+
+.pf2e-magic-item-finder .detail-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+}
+.pf2e-magic-item-finder .trait-pill {
+  padding: 0.1rem 0.45rem;
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  border: 1px solid var(--pf2e-mif-border);
+  border-radius: 3px;
+  background: var(--pf2e-mif-surface);
+}
+
+.pf2e-magic-item-finder .detail-source {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.pf2e-magic-item-finder .detail-section {
+  margin-top: 0.9rem;
+}
+.pf2e-magic-item-finder .detail-section h3 {
+  margin: 0 0 0.4rem;
+  border: none;
+  border-bottom: 1px solid var(--pf2e-mif-border-soft);
+  padding-bottom: 0.2rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pf2e-magic-item-finder .detail-tag {
+  border: 1px solid var(--pf2e-mif-border-soft);
+  border-radius: 4px;
+  background: var(--pf2e-mif-surface);
+  padding: 0.4rem 0.55rem;
+  margin-bottom: 0.4rem;
+}
+.pf2e-magic-item-finder .detail-tag-name {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.pf2e-magic-item-finder .detail-tag-name i {
+  color: var(--pf2e-mif-accent);
+  font-size: 0.75rem;
+}
+.pf2e-magic-item-finder .detail-tag-method {
+  margin-left: auto;
+  font-size: 0.66rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+}
+.pf2e-magic-item-finder .detail-tag-snippet {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.pf2e-magic-item-finder .detail-description-body {
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.pf2e-magic-item-finder .detail-description-body :first-child {
+  margin-top: 0;
+}
+
+/* ---- Open button injected into the Compendium sidebar header ------------- */
+.compendium-sidebar .header-search a.pf2e-magic-item-finder-open,
+#compendium .header-search a.pf2e-magic-item-finder-open {
+  flex: 0 0 auto;
+  cursor: pointer;
+  margin: 0 2px;
+}

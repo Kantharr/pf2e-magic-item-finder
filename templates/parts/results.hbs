@@ -1,0 +1,73 @@
+<section class="pf2e-mif-results-pane">
+  {{#if ready}}
+  {{!-- Column splitters straddle the results pane's edges (its left edge is the
+        sidebar boundary, its right edge the detail boundary). --}}
+  <div class="pf2e-mif-splitter pf2e-mif-splitter-left" data-splitter="sidebar"
+       role="separator" aria-orientation="vertical" aria-hidden="true"></div>
+  <div class="pf2e-mif-splitter pf2e-mif-splitter-right" data-splitter="detail"
+       role="separator" aria-orientation="vertical" aria-hidden="true"></div>
+  <div class="pf2e-mif-results-toolbar">
+    <div class="pf2e-mif-count">
+      {{#if results.empty}}
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.None"}}
+      {{else if results.capped}}
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Capped" shown=results.shown total=results.total}}
+      {{else}}
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Count" total=results.total}}
+      {{/if}}
+    </div>
+    <div class="pf2e-mif-sort">
+      <label>{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Sort"}}
+        <select data-filter="sort">
+          {{#each sidebar.sortOptions}}
+          <option value="{{value}}"{{#if selected}} selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <button type="button" class="pf2e-mif-sortdir" data-action="toggleSortDir"
+              data-dir="{{sidebar.sortDir}}" data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortDir"}}">
+        <i class="fa-solid {{#if sidebar.sortDirDesc}}fa-arrow-up-wide-short{{else}}fa-arrow-down-short-wide{{/if}}"></i>
+      </button>
+      {{!-- Export the current filtered set (not the whole index). --}}
+      <div class="pf2e-mif-export">
+        <button type="button" data-action="exportCsv" {{#if results.empty}}disabled{{/if}}
+                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.CsvTip"}}">
+          <i class="fa-solid fa-file-csv"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Csv"}}
+        </button>
+        <button type="button" data-action="exportJson" {{#if results.empty}}disabled{{/if}}
+                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.JsonTip"}}">
+          <i class="fa-solid fa-file-code"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Json"}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pf2e-mif-results" tabindex="0" role="listbox"
+       aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.List"}}">
+    <div class="pf2e-mif-row pf2e-mif-head" aria-hidden="true">
+      <span class="col-name">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Name"}}</span>
+      <span class="col-level">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Level"}}</span>
+      <span class="col-rarity">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Rarity"}}</span>
+      <span class="col-price">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Price"}}</span>
+      <span class="col-traits">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Traits"}}</span>
+    </div>
+    {{#each results.rows}}
+    <div class="pf2e-mif-row rarity-{{rarity}}{{#if selected}} selected{{/if}}" role="option"
+         aria-selected="{{selected}}" draggable="true" data-uuid="{{uuid}}" data-action="selectItem">
+      <span class="col-name">
+        {{#if img}}<img class="row-img" src="{{img}}" alt="" loading="lazy" />{{/if}}
+        <span class="row-name-text">{{name}}</span>
+        <a class="row-open" data-action="openItem" data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Open"}}"
+           aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Open"}}"><i class="fa-solid fa-up-right-from-square"></i></a>
+      </span>
+      <span class="col-level">{{level}}</span>
+      <span class="col-rarity"><span class="rarity-dot rarity-{{rarity}}"></span>{{rarityLabel}}</span>
+      <span class="col-price">{{price}}</span>
+      <span class="col-traits" data-tooltip="{{traits}}">{{traits}}</span>
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  <p class="pf2e-mif-loading">{{localize "PF2E_MAGIC_ITEM_FINDER.App.Loading"}}</p>
+  {{/if}}
+</section>
