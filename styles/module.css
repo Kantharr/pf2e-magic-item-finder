@@ -24,6 +24,14 @@
   --pf2e-mif-border-soft: color-mix(in srgb, currentColor 12%, transparent);
 }
 
+/* Headings read in the window's inherited text colour rather than PF2e's
+   brighter heading colour, so the bold labels (filter headers, item name,
+   detail sections) match the surrounding body text on every theme. */
+.pf2e-magic-item-finder h2,
+.pf2e-magic-item-finder h3 {
+  color: inherit;
+}
+
 /* ---- Overall layout: sidebar | results | detail -------------------------
    Under ApplicationV2's HandlebarsApplicationMixin each part template's single
    root element *is* the part element and a direct child of `.window-content`,
