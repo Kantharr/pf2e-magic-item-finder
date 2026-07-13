@@ -10,8 +10,6 @@
     <div class="pf2e-mif-count">
       {{#if results.empty}}
         {{localize "PF2E_MAGIC_ITEM_FINDER.Results.None"}}
-      {{else if results.capped}}
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Capped" shown=results.shown total=results.total}}
       {{else}}
         {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Count" total=results.total}}
       {{/if}}
@@ -66,6 +64,37 @@
       <span class="col-traits" data-tooltip="{{traits}}">{{traits}}</span>
     </div>
     {{/each}}
+  </div>
+
+  <div class="pf2e-mif-pagination">
+    <label class="pf2e-mif-pagesize">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.RowsPerPage"}}
+      <select data-page-size="select">
+        {{#each results.pageSizeOptions}}
+        <option value="{{value}}"{{#if selected}} selected{{/if}}>{{value}}</option>
+        {{/each}}
+      </select>
+    </label>
+    <div class="pf2e-mif-pagenav">
+      <button type="button" data-action="firstPage" {{#unless results.canPrev}}disabled{{/unless}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.FirstPage"}}">
+        <i class="fa-solid fa-angles-left"></i>
+      </button>
+      <button type="button" data-action="prevPage" {{#unless results.canPrev}}disabled{{/unless}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.PrevPage"}}">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <span class="pf2e-mif-pageinfo">
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Page" page=results.page totalPages=results.totalPages}}
+      </span>
+      <button type="button" data-action="nextPage" {{#unless results.canNext}}disabled{{/unless}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.NextPage"}}">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+      <button type="button" data-action="lastPage" {{#unless results.canNext}}disabled{{/unless}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.LastPage"}}">
+        <i class="fa-solid fa-angles-right"></i>
+      </button>
+    </div>
   </div>
   {{else}}
   <p class="pf2e-mif-loading">{{localize "PF2E_MAGIC_ITEM_FINDER.App.Loading"}}</p>

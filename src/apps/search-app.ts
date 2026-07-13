@@ -22,10 +22,11 @@ import type {
 // reference resolves after Foundry has booted.
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-/** Max rows rendered into the DOM at once. The engine still reports the uncapped
- * total so the footer can show "showing N of M"; refine to see the rest. Keeps
- * scrolling smooth over the full ~3,300-item corpus without a virtualizer. */
-const RESULT_CAP = 500;
+/** Rows-per-page choices offered in the pagination bar. */
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
+
+/** Default page size, applied until the user picks another option. */
+const DEFAULT_PAGE_SIZE = 50;
 
 /** Search-input debounce (ms) — one query per typing burst (recon/Phase 5). */
 const SEARCH_DEBOUNCE_MS = 250;
@@ -205,6 +206,10 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       clearFilters: MagicItemFinderApp.#onClearFilters,
       selectItem: MagicItemFinderApp.#onSelectItem,
       openItem: MagicItemFinderApp.#onOpenItem,
+      firstPage: MagicItemFinderApp.#onFirstPage,
+      prevPage: MagicItemFinderApp.#onPrevPage,
+      nextPage: MagicItemFinderApp.#onNextPage,
+      lastPage: MagicItemFinderApp.#onLastPage,
       savePreset: MagicItemFinderApp.#onSavePreset,
       renamePreset: MagicItemFinderApp.#onRenamePreset,
       deletePreset: MagicItemFinderApp.#onDeletePreset,
@@ -232,6 +237,12 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   /** Cached last query result; recomputed when {@link #resultDirty}. */
   #lastResult: QueryResult = { items: [], total: 0 };
+
+  /** 0-based current page within the filtered/sorted result set. */
+  #page = 0;
+
+  /** Rows per page; one of {@link PAGE_SIZE_OPTIONS}. */
+  #pageSize: number = DEFAULT_PAGE_SIZE;
 
   /** uuids currently shown (result order), for keyboard navigation. */
   #shownUuids: string[] = [];
@@ -271,14 +282,31 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     };
   }
 
-  /** Run (or reuse) the query for the current filter state, capped for the DOM. */
+  /** Run (or reuse) the query for the current filter state, one page at a time. */
   #result(engine: SearchEngine): QueryResult {
     if (this.#resultDirty) {
-      this.#lastResult = engine.query(this.#filter, { limit: RESULT_CAP });
+      this.#lastResult = this.#queryPage(engine, this.#page);
+      // Clamp to the last valid page once the true total is known — a filter
+      // change or a live index rebuild can shrink the set out from under the
+      // page the user was viewing.
+      const maxPage = this.#maxPage(this.#lastResult.total);
+      if (this.#page > maxPage) {
+        this.#page = maxPage;
+        this.#lastResult = this.#queryPage(engine, this.#page);
+      }
       this.#shownUuids = this.#lastResult.items.map((i) => i.uuid);
       this.#resultDirty = false;
     }
     return this.#lastResult;
+  }
+
+  #queryPage(engine: SearchEngine, page: number): QueryResult {
+    return engine.query(this.#filter, { limit: this.#pageSize, offset: page * this.#pageSize });
+  }
+
+  /** Last valid 0-based page index for a given total (0 when there are no results). */
+  #maxPage(total: number): number {
+    return total === 0 ? 0 : Math.floor((total - 1) / this.#pageSize);
   }
 
   /** Build the sidebar's option lists + active-selection flags. */
@@ -319,15 +347,19 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     };
   }
 
-  /** Build the results rows + counts. */
+  /** Build the results rows + counts + pagination context. */
   #resultsContext(result: QueryResult): object {
     const rows: RowVM[] = result.items.map((item) => this.#rowVM(item));
+    const totalPages = Math.max(1, Math.ceil(result.total / this.#pageSize));
     return {
       rows,
-      shown: result.items.length,
       total: result.total,
-      capped: result.total > result.items.length,
       empty: result.total === 0,
+      page: this.#page + 1,
+      totalPages,
+      pageSizeOptions: PAGE_SIZE_OPTIONS.map((n) => ({ value: n, selected: n === this.#pageSize })),
+      canPrev: this.#page > 0,
+      canNext: this.#page < totalPages - 1,
     };
   }
 
@@ -480,6 +512,13 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
         this.#applyPreset((target as HTMLSelectElement).value);
         return;
       }
+      // Page size isn't part of the filter state; it re-queries directly.
+      if (target?.dataset?.pageSize === "select") {
+        const n = Number((target as HTMLSelectElement).value);
+        if (Number.isFinite(n) && n > 0) this.#pageSize = n;
+        this.#markDirtyAndRenderResults();
+        return;
+      }
       const field = target?.dataset?.filter;
       if (!field) return;
       this.#applyFieldChange(field, target!);
@@ -576,7 +615,18 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     void this.render({ parts: ["detail"] });
   }
 
+  /** A filter/sort change invalidates the current page — snap back to page 1. */
   #markDirtyAndRenderResults(): void {
+    this.#page = 0;
+    this.#resultDirty = true;
+    void this.render({ parts: ["results"] });
+  }
+
+  /** Jump to a page (clamped to 0) and re-render just the results part. */
+  #goToPage(page: number): void {
+    const clamped = Math.max(0, page);
+    if (clamped === this.#page) return;
+    this.#page = clamped;
     this.#resultDirty = true;
     void this.render({ parts: ["results"] });
   }
@@ -593,6 +643,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   /** Called by the module when the item index (and engine) is rebuilt live. */
   onIndexRebuilt(): void {
+    this.#page = 0;
     this.#resultDirty = true;
     this.#descriptionCache.clear();
     if (this.rendered) void this.render({ parts: ["sidebar", "results", "detail"] });
@@ -649,6 +700,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#filter = {};
     this.#selectedUuid = null;
     this.#activePreset = null;
+    this.#page = 0;
     this.#resultDirty = true;
     void this.render({ parts: ["sidebar", "results", "detail"] });
   }
@@ -663,6 +715,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       this.#filter = {};
       this.#selectedUuid = null;
       this.#activePreset = null;
+      this.#page = 0;
       this.#resultDirty = true;
       void this.render({ parts: ["sidebar", "results", "detail"] });
       return;
@@ -673,6 +726,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#filter = coerceAppliedState(preset.state, engine.options);
     this.#activePreset = preset.name;
     this.#selectedUuid = null;
+    this.#page = 0;
     this.#resultDirty = true;
     void this.render({ parts: ["sidebar", "results", "detail"] });
   }
@@ -772,5 +826,23 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     event.stopPropagation();
     const uuid = target.closest<HTMLElement>("[data-uuid]")?.dataset.uuid;
     if (uuid) void this.#openSheet(uuid);
+  }
+
+  // ---- pagination ------------------------------------------------------------
+
+  static #onFirstPage(this: MagicItemFinderApp): void {
+    this.#goToPage(0);
+  }
+
+  static #onPrevPage(this: MagicItemFinderApp): void {
+    this.#goToPage(this.#page - 1);
+  }
+
+  static #onNextPage(this: MagicItemFinderApp): void {
+    this.#goToPage(this.#page + 1);
+  }
+
+  static #onLastPage(this: MagicItemFinderApp): void {
+    this.#goToPage(this.#maxPage(this.#lastResult.total));
   }
 }

@@ -28,7 +28,12 @@
   "PF2E_MAGIC_ITEM_FINDER.Results.SortDir": "Toggle sort direction",
   "PF2E_MAGIC_ITEM_FINDER.Results.None": "No items match the current filters.",
   "PF2E_MAGIC_ITEM_FINDER.Results.Count": "{total} items",
-  "PF2E_MAGIC_ITEM_FINDER.Results.Capped": "Showing {shown} of {total} — refine to see the rest",
+  "PF2E_MAGIC_ITEM_FINDER.Results.RowsPerPage": "Rows per page",
+  "PF2E_MAGIC_ITEM_FINDER.Results.Page": "Page {page} of {totalPages}",
+  "PF2E_MAGIC_ITEM_FINDER.Results.FirstPage": "First page",
+  "PF2E_MAGIC_ITEM_FINDER.Results.PrevPage": "Previous page",
+  "PF2E_MAGIC_ITEM_FINDER.Results.NextPage": "Next page",
+  "PF2E_MAGIC_ITEM_FINDER.Results.LastPage": "Last page",
 
   "PF2E_MAGIC_ITEM_FINDER.Detail.Empty": "Select an item to see its detail.",
   "PF2E_MAGIC_ITEM_FINDER.Detail.OpenSheet": "Open item sheet",

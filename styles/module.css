@@ -384,6 +384,42 @@ body.pf2e-mif-resizing * {
   outline: none;
 }
 
+.pf2e-magic-item-finder .pf2e-mif-pagination {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-top: 1px solid var(--pf2e-mif-border-soft);
+  font-size: 0.82rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-pagesize {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  opacity: 0.85;
+}
+.pf2e-magic-item-finder .pf2e-mif-pagesize select {
+  width: auto;
+}
+.pf2e-magic-item-finder .pf2e-mif-pagenav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pf2e-magic-item-finder .pf2e-mif-pagenav button {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.2rem 0.45rem;
+  line-height: 1;
+}
+.pf2e-magic-item-finder .pf2e-mif-pageinfo {
+  min-width: 6.5rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .pf2e-magic-item-finder .pf2e-mif-row {
   display: grid;
   grid-template-columns: minmax(0, 2.4fr) 3.2rem 5rem 5.5rem minmax(0, 2fr);

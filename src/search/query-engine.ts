@@ -50,11 +50,16 @@ export interface FilterState {
 /** Options for a single {@link SearchEngine.query} call. */
 export interface QueryOptions {
   /**
-   * Cap on returned rows. Omit for no cap (the UI virtualizes large sets in
-   * Phase 5). {@link QueryResult.total} always reflects the uncapped match
-   * count so callers can show "showing N of M".
+   * Cap on returned rows (a page size). Omit for no cap. {@link QueryResult.total}
+   * always reflects the uncapped match count so callers can show "showing N of
+   * M" or compute a page count.
    */
   limit?: number;
+  /**
+   * Rows to skip before collecting up to {@link limit} — pairs with `limit` for
+   * pagination (`offset = pageIndex * pageSize`). Defaults to 0.
+   */
+  offset?: number;
 }
 
 /** The outcome of a query: the (optionally capped) sorted rows + the full count. */
@@ -173,10 +178,11 @@ export class SearchEngine {
     const sorted = this.sortRows(rows, state, rank);
 
     const total = sorted.length;
+    const offset = Math.max(0, queryOptions.offset ?? 0);
     const limited =
-      queryOptions.limit !== undefined && queryOptions.limit < total
-        ? sorted.slice(0, queryOptions.limit)
-        : sorted;
+      queryOptions.limit !== undefined
+        ? sorted.slice(offset, offset + queryOptions.limit)
+        : sorted.slice(offset);
     return { items: limited, total };
   }
 

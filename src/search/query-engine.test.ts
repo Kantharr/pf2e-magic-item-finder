@@ -325,6 +325,35 @@ describe("result cap", () => {
   });
 });
 
+describe("pagination (limit + offset)", () => {
+  it("pages through name-ordered results without gaps or overlap", () => {
+    const engine = makeEngine();
+    const page1 = engine.query({}, { limit: 2, offset: 0 });
+    const page2 = engine.query({}, { limit: 2, offset: 2 });
+    const page3 = engine.query({}, { limit: 2, offset: 4 });
+    const page4 = engine.query({}, { limit: 2, offset: 6 });
+
+    expect(page1.items.map((i) => i.name)).toEqual(["Amulet of Fire", "Boots of Speed"]);
+    expect(page2.items.map((i) => i.name)).toEqual(["Cloak of Elvenkind", "Dagger of Doom"]);
+    expect(page3.items.map((i) => i.name)).toEqual(["Everlasting Rations", "Flaming Sphere Wand"]);
+    expect(page4.items).toEqual([]);
+    // Every page reports the same uncapped total.
+    for (const page of [page1, page2, page3, page4]) expect(page.total).toBe(SPECS.length);
+  });
+
+  it("pages through relevance-ranked text results in the same order as an unpaged query", () => {
+    const engine = makeEngine();
+    const full = engine.query({ text: "cursed" }).items.map((i) => i.name);
+    expect(full.length).toBeGreaterThanOrEqual(2);
+
+    const paged: string[] = [];
+    for (let offset = 0; offset < full.length; offset++) {
+      paged.push(...engine.query({ text: "cursed" }, { limit: 1, offset }).items.map((i) => i.name));
+    }
+    expect(paged).toEqual(full);
+  });
+});
+
 describe("option lists (handed to Phase 5)", () => {
   it("exposes the full tag dictionary with per-tag corpus counts", () => {
     const { tags } = makeEngine().options;
