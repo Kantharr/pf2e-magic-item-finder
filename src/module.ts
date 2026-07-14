@@ -207,27 +207,46 @@ function injectCompendiumButton(app: unknown, html: unknown): void {
 
     const root = rootElement(html);
     if (!root) return;
-    // Idempotent: both render hooks fire on every re-render.
-    if (root.querySelector(`a.${MODULE_ID}-open`)) return;
+    // Idempotent: both render hooks fire on every re-render. Match by class
+    // only (not tag) — the button is an <a> on v12 but a <button> on v13+.
+    if (root.querySelector(`.${MODULE_ID}-open`)) return;
 
-    const headerSearch = root.querySelector<HTMLElement>(".directory-header .header-search");
+    // Locate the search-control container. v12 (ApplicationV1) wraps the
+    // controls in `.directory-header .header-search`; v13+ (ApplicationV2)
+    // rebuilt it as a bare `<search>` element with no class.
+    const headerSearch = root.querySelector<HTMLElement>(
+      ".directory-header .header-search, .directory-header search",
+    );
     if (!headerSearch) return;
 
-    const btn = document.createElement("a");
-    btn.className = `header-control ${MODULE_ID}-open`;
-    btn.setAttribute(
-      "data-tooltip",
-      game.i18n?.localize("PF2E_MAGIC_ITEM_FINDER.Control.Open") ?? "Magic Item Finder",
-    );
-    btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i>`;
+    // The filter control is an `<i class="filter">` funnel on v12 but an
+    // `<button class="inline-control filter …">` on v13+.
+    const filterCtrl = headerSearch.querySelector<HTMLElement>("i.filter, button.filter");
+    const tooltip =
+      game.i18n?.localize("PF2E_MAGIC_ITEM_FINDER.Control.Open") ?? "Magic Item Finder";
+
+    let btn: HTMLElement;
+    if (filterCtrl?.tagName === "BUTTON") {
+      // v13+ ApplicationV2: mirror the sibling `inline-control` buttons, whose
+      // icon comes from Font Awesome classes on the button itself (no child <i>).
+      btn = document.createElement("button");
+      (btn as HTMLButtonElement).type = "button";
+      btn.className = `inline-control icon fa-solid fa-wand-magic-sparkles ${MODULE_ID}-open`;
+      btn.setAttribute("aria-label", tooltip);
+    } else {
+      // v12 ApplicationV1 markup.
+      btn = document.createElement("a");
+      btn.className = `header-control ${MODULE_ID}-open`;
+      btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i>`;
+    }
+    btn.setAttribute("data-tooltip", tooltip);
     btn.addEventListener("click", (ev) => {
       ev.preventDefault();
       openSearchApp();
     });
 
-    // Place it immediately after the filter funnel icon.
-    const filterIcon = headerSearch.querySelector("i.filter");
-    if (filterIcon) filterIcon.insertAdjacentElement("afterend", btn);
+    // Place it immediately after the filter control.
+    if (filterCtrl) filterCtrl.insertAdjacentElement("afterend", btn);
     else headerSearch.prepend(btn);
   } catch (err) {
     console.error(`${MODULE_ID} | failed to add compendium button`, err);

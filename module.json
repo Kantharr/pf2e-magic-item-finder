@@ -2,13 +2,13 @@
   "id": "pf2e-magic-item-finder",
   "title": "PF2e Magic Item Finder",
   "description": "Search PF2e magic items by ability tag (fly, heal, teleport…) plus full-text description search, in a standalone window. Reads the live PF2e equipment compendium and joins it to a bundled, pre-computed ability-tag map.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "authors": [
     { "name": "Kantharr" }
   ],
   "compatibility": {
     "minimum": "12",
-    "verified": "12"
+    "verified": "14"
   },
   "relationships": {
     "systems": [
@@ -17,7 +17,7 @@
         "type": "system",
         "compatibility": {
           "minimum": "6.0.0",
-          "verified": "6.9.0"
+          "verified": "8.3.0"
         }
       }
     ]

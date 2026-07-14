@@ -671,9 +671,17 @@ body.pf2e-mif-resizing * {
 }
 
 /* ---- Open button injected into the Compendium sidebar header ------------- */
+/* v12 (ApplicationV1): an <a> inside `.header-search`. */
 .compendium-sidebar .header-search a.pf2e-magic-item-finder-open,
 #compendium .header-search a.pf2e-magic-item-finder-open {
   flex: 0 0 auto;
   cursor: pointer;
   margin: 0 2px;
+}
+/* v13+ (ApplicationV2): a <button.inline-control> inside the bare <search>.
+   It inherits the sibling controls' styling; only ensure it doesn't stretch. */
+#compendium .directory-header search button.pf2e-magic-item-finder-open,
+.compendium-sidebar .directory-header search button.pf2e-magic-item-finder-open {
+  flex: 0 0 auto;
+  cursor: pointer;
 }
