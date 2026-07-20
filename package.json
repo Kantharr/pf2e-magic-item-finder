@@ -1,6 +1,6 @@
 {
   "name": "pf2e-magic-item-finder",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FoundryVTT (PF2e) module: search magic items by ability tag.",
   "private": true,
   "type": "module",
