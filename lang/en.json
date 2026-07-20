@@ -15,6 +15,8 @@
   "PF2E_MAGIC_ITEM_FINDER.Filter.IncludePriceless": "Include priceless",
   "PF2E_MAGIC_ITEM_FINDER.Filter.Traits": "Traits",
   "PF2E_MAGIC_ITEM_FINDER.Filter.TraitsHint": "Click to toggle; scroll for more.",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.WeaponGroup": "Weapon group",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.ArmorCategory": "Armor",
   "PF2E_MAGIC_ITEM_FINDER.Filter.Clear": "Clear filters",
 
   "PF2E_MAGIC_ITEM_FINDER.Results.Name": "Name",
@@ -24,8 +26,7 @@
   "PF2E_MAGIC_ITEM_FINDER.Results.Traits": "Traits",
   "PF2E_MAGIC_ITEM_FINDER.Results.List": "Search results",
   "PF2E_MAGIC_ITEM_FINDER.Results.Open": "Open item sheet",
-  "PF2E_MAGIC_ITEM_FINDER.Results.Sort": "Sort",
-  "PF2E_MAGIC_ITEM_FINDER.Results.SortDir": "Toggle sort direction",
+  "PF2E_MAGIC_ITEM_FINDER.Results.SortBy": "Click to sort; click again to reverse.",
   "PF2E_MAGIC_ITEM_FINDER.Results.None": "No items match the current filters.",
   "PF2E_MAGIC_ITEM_FINDER.Results.Count": "{total} items",
   "PF2E_MAGIC_ITEM_FINDER.Results.RowsPerPage": "Rows per page",

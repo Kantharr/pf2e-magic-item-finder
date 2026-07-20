@@ -82,6 +82,34 @@
     <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.TraitsHint"}}</p>
   </section>
 
+  {{#if sidebar.hasWeaponGroups}}
+  <section class="pf2e-mif-filter">
+    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.WeaponGroup"}}</h3>
+    <div class="pf2e-mif-chips">
+      {{#each sidebar.weaponGroups}}
+      <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
+              data-action="toggleWeaponGroup" data-group="{{value}}" aria-pressed="{{active}}">
+        {{label}}
+      </button>
+      {{/each}}
+    </div>
+  </section>
+  {{/if}}
+
+  {{#if sidebar.hasArmorCategories}}
+  <section class="pf2e-mif-filter">
+    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.ArmorCategory"}}</h3>
+    <div class="pf2e-mif-chips">
+      {{#each sidebar.armorCategories}}
+      <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
+              data-action="toggleArmorCategory" data-category="{{value}}" aria-pressed="{{active}}">
+        {{label}}
+      </button>
+      {{/each}}
+    </div>
+  </section>
+  {{/if}}
+
   <div class="pf2e-mif-sidebar-footer">
     {{!-- Presets: apply from the dropdown; save/rename/delete the current state. --}}
     <section class="pf2e-mif-presets">

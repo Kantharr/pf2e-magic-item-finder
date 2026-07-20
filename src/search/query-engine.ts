@@ -32,6 +32,15 @@ export interface FilterState {
   rarities?: readonly string[];
   /** Selected trait slugs (OR within). Empty = any traits. */
   traits?: readonly string[];
+  /**
+   * Selected weapon groups (sword, firearm…) and armor categories (light/medium/
+   * heavy). These two form a single "item type" axis: an item is kept if it
+   * matches *any* selected weapon group **or** *any* selected armor category
+   * (OR across both lists), so picking "firearm" + "light" shows firearms and
+   * light armor together. Empty on both sides = no type filter.
+   */
+  weaponGroups?: readonly string[];
+  armorCategories?: readonly string[];
   /** Inclusive gp-equivalent price bounds; null/undefined = unbounded. */
   minPriceGp?: number | null;
   maxPriceGp?: number | null;
@@ -81,6 +90,10 @@ export interface FilterOptionLists {
   tags: TagOption[];
   /** Distinct trait slugs present in the corpus, A→Z. */
   traits: string[];
+  /** Distinct weapon groups present among weapons, A→Z. */
+  weaponGroups: string[];
+  /** Distinct armor categories present among armor, in size order (light→heavy). */
+  armorCategories: string[];
   /** Distinct rarities present, in canonical order (common→uncommon→rare→unique). */
   rarities: string[];
   /** Observed level range across the corpus (for slider bounds). */
@@ -108,6 +121,9 @@ export interface SearchEngineOptions {
 
 /** Canonical PF2e rarity order (rarest last). */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
+
+/** Canonical armor-category order (lightest first); others trail alphabetically. */
+const ARMOR_CATEGORY_ORDER = ["light", "medium", "heavy"] as const;
 
 /** MiniSearch document shape (one per indexed item). */
 interface TextDoc {
@@ -272,6 +288,17 @@ function matchesStructured(item: IndexedItem, state: FilterState): boolean {
     if (!state.traits.some((t) => item.traits.includes(t))) return false;
   }
 
+  // Weapon group + armor category form one OR-combined "item type" axis.
+  const weaponGroups = state.weaponGroups ?? [];
+  const armorCategories = state.armorCategories ?? [];
+  if (weaponGroups.length > 0 || armorCategories.length > 0) {
+    const matchesWeapon =
+      item.type === "weapon" && item.group != null && weaponGroups.includes(item.group);
+    const matchesArmor =
+      item.type === "armor" && item.category != null && armorCategories.includes(item.category);
+    if (!matchesWeapon && !matchesArmor) return false;
+  }
+
   const hasPriceBound = state.minPriceGp != null || state.maxPriceGp != null;
   if (hasPriceBound) {
     if (item.priceGp == null) {
@@ -348,6 +375,20 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
   for (const item of index.items) for (const t of item.traits) traitSet.add(t);
   const traits = [...traitSet].sort((a, b) => a.localeCompare(b));
 
+  // Weapon groups (from weapons) and armor categories (from armor), each
+  // distinct across the corpus. Armor categories follow the canonical
+  // light→heavy order; anything unexpected trails alphabetically.
+  const weaponGroupSet = new Set<string>();
+  const armorCategorySet = new Set<string>();
+  for (const item of index.items) {
+    if (item.type === "weapon" && item.group) weaponGroupSet.add(item.group);
+    if (item.type === "armor" && item.category) armorCategorySet.add(item.category);
+  }
+  const weaponGroups = [...weaponGroupSet].sort((a, b) => a.localeCompare(b));
+  const armorCategories: string[] = [];
+  for (const c of ARMOR_CATEGORY_ORDER) if (armorCategorySet.delete(c)) armorCategories.push(c);
+  armorCategories.push(...[...armorCategorySet].sort((a, b) => a.localeCompare(b)));
+
   // Rarities: canonical order, then any unexpected values alphabetically.
   const raritySet = new Set<string>();
   for (const item of index.items) raritySet.add(item.rarity);
@@ -375,5 +416,5 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
     : { min: 0, max: 0 };
   const priceRange = anyPriced ? { min: minPrice, max: maxPrice } : null;
 
-  return { tags, traits, rarities, levelRange, priceRange };
+  return { tags, traits, weaponGroups, armorCategories, rarities, levelRange, priceRange };
 }

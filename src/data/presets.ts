@@ -79,6 +79,8 @@ function sanitizeState(state: FilterState): FilterState {
   if (state.includePriceless) out.includePriceless = true;
   if (state.rarities?.length) out.rarities = [...state.rarities];
   if (state.traits?.length) out.traits = [...state.traits];
+  if (state.weaponGroups?.length) out.weaponGroups = [...state.weaponGroups];
+  if (state.armorCategories?.length) out.armorCategories = [...state.armorCategories];
   if (state.tags?.length) out.tags = [...state.tags];
   if (state.sort) out.sort = state.sort;
   if (state.sortDir) out.sortDir = state.sortDir;
@@ -151,6 +153,8 @@ export function coerceAppliedState(
 ): FilterState {
   const tagNames = new Set(options.tags.map((t) => t.name));
   const traitSet = new Set(options.traits);
+  const weaponGroupSet = new Set(options.weaponGroups);
+  const armorCategorySet = new Set(options.armorCategories);
   const raritySet = new Set(options.rarities);
 
   const keep = (values: readonly string[] | undefined, allowed: Set<string>): string[] | undefined => {
@@ -171,6 +175,8 @@ export function coerceAppliedState(
     includePriceless: state.includePriceless ? true : undefined,
     rarities: keep(state.rarities, raritySet),
     traits: keep(state.traits, traitSet),
+    weaponGroups: keep(state.weaponGroups, weaponGroupSet),
+    armorCategories: keep(state.armorCategories, armorCategorySet),
     tags: keep(state.tags, tagNames),
     sort: state.sort && sortFields.includes(state.sort) ? state.sort : undefined,
     sortDir: state.sortDir && sortDirs.includes(state.sortDir) ? state.sortDir : undefined,

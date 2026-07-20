@@ -14,6 +14,8 @@ const options: FilterOptionLists = {
     { name: "Healing", count: 30 },
   ],
   traits: ["fire", "invested", "magical"],
+  weaponGroups: ["sword", "firearm", "bow"],
+  armorCategories: ["light", "medium", "heavy"],
   rarities: ["common", "uncommon", "rare"],
   levelRange: { min: 0, max: 20 },
   priceRange: { min: 1, max: 100000 },
@@ -57,6 +59,16 @@ describe("coerceAppliedState", () => {
     expect(out.tags).toEqual(["Flight"]);
     expect(out.traits).toEqual(["fire"]);
     expect(out.rarities).toEqual(["rare"]);
+  });
+
+  it("keeps/drops weapon groups and armor categories against the option lists", () => {
+    const state: FilterState = {
+      weaponGroups: ["firearm", "trebuchet"],
+      armorCategories: ["light", "unobtainium"],
+    };
+    const out = coerceAppliedState(state, options);
+    expect(out.weaponGroups).toEqual(["firearm"]);
+    expect(out.armorCategories).toEqual(["light"]);
   });
 
   it("collapses an entirely-unknown selection to undefined (not an empty array)", () => {

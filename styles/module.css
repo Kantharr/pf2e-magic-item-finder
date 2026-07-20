@@ -342,32 +342,9 @@ body.pf2e-mif-resizing * {
 .pf2e-magic-item-finder .pf2e-mif-count {
   opacity: 0.85;
 }
-.pf2e-magic-item-finder .pf2e-mif-sort {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.pf2e-magic-item-finder .pf2e-mif-sort label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.8rem;
-}
-.pf2e-magic-item-finder .pf2e-mif-sort select {
-  width: auto;
-}
-.pf2e-magic-item-finder .pf2e-mif-sortdir {
-  flex: 0 0 auto;
-  width: auto;
-  padding: 0.2rem 0.45rem;
-  line-height: 1;
-}
 .pf2e-magic-item-finder .pf2e-mif-export {
   display: flex;
   gap: 0.3rem;
-  margin-left: 0.35rem;
-  padding-left: 0.5rem;
-  border-left: 1px solid var(--pf2e-mif-border-soft);
 }
 .pf2e-magic-item-finder .pf2e-mif-export button {
   flex: 0 0 auto;
@@ -451,6 +428,34 @@ body.pf2e-mif-resizing * {
 
 .pf2e-magic-item-finder .pf2e-mif-row:not(.pf2e-mif-head):hover {
   background: var(--pf2e-mif-surface);
+}
+
+/* Clickable sort headers (Name / Level / Price). */
+.pf2e-magic-item-finder .pf2e-mif-sortable {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  outline: none;
+}
+.pf2e-magic-item-finder .pf2e-mif-sortable:hover {
+  color: var(--pf2e-mif-accent);
+}
+.pf2e-magic-item-finder .pf2e-mif-sortable:focus-visible {
+  box-shadow: 0 0 0 2px var(--pf2e-mif-accent);
+}
+.pf2e-magic-item-finder .pf2e-mif-sort-icon {
+  font-size: 0.7em;
+  opacity: 0.35;
+}
+.pf2e-magic-item-finder .pf2e-mif-sortable.sorted {
+  color: var(--pf2e-mif-accent);
+  opacity: 1;
+}
+.pf2e-magic-item-finder .pf2e-mif-sortable.sorted .pf2e-mif-sort-icon {
+  opacity: 1;
 }
 
 /* Rarity row tint + left accent (common = none). */

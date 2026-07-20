@@ -18,6 +18,12 @@ interface ItemSpec {
   priceGp: number | null;
   tags: string[];
   description?: string;
+  /** Item document type (default "equipment"); "weapon"/"armor" drive type filters. */
+  type?: string;
+  /** system.category (simple/martial for weapons; light/medium/heavy for armor). */
+  category?: string | null;
+  /** system.group (weapon group, e.g. firearm/sword; armor group). */
+  group?: string | null;
 }
 
 /** Build a full {@link IndexedItem} from a terse spec (uuid derived from name). */
@@ -34,7 +40,9 @@ function makeItem(spec: ItemSpec): IndexedItem {
     source: "Test",
     slug,
     img: null,
-    type: "equipment",
+    type: spec.type ?? "equipment",
+    category: spec.category ?? null,
+    group: spec.group ?? null,
     tags: spec.tags,
     snippets: {},
     matchMethod: {},
@@ -380,5 +388,45 @@ describe("option lists (handed to Phase 5)", () => {
     const { levelRange, priceRange } = makeEngine().options;
     expect(levelRange).toEqual({ min: 1, max: 7 });
     expect(priceRange).toEqual({ min: 60, max: 1000 });
+  });
+});
+
+describe("weapon group / armor category filter", () => {
+  const TYPED: ItemSpec[] = [
+    { name: "Flaming Longsword", level: 8, rarity: "common", traits: ["magical"], priceGp: 200, tags: [], type: "weapon", category: "martial", group: "sword" },
+    { name: "Coldstar Pistols", level: 23, rarity: "unique", traits: ["artifact"], priceGp: null, tags: [], type: "weapon", category: "martial", group: "firearm" },
+    { name: "Dueling Pistol +1", level: 4, rarity: "common", traits: ["magical"], priceGp: 160, tags: [], type: "weapon", category: "martial", group: "firearm" },
+    { name: "Glamered Leather", level: 5, rarity: "common", traits: ["magical"], priceGp: 140, tags: [], type: "armor", category: "light", group: "leather" },
+    { name: "Fortress Plate", level: 12, rarity: "rare", traits: ["magical"], priceGp: 2000, tags: [], type: "armor", category: "heavy", group: "plate" },
+    { name: "Ring of Wizardry", level: 6, rarity: "uncommon", traits: ["arcane"], priceGp: 360, tags: [], type: "equipment", category: null, group: null },
+  ];
+  const engine = createSearchEngine(makeIndex(TYPED));
+
+  it("derives weapon groups (A→Z) and armor categories (light→heavy)", () => {
+    expect(engine.options.weaponGroups).toEqual(["firearm", "sword"]);
+    expect(engine.options.armorCategories).toEqual(["light", "heavy"]);
+  });
+
+  it("filters weapons by group (OR within)", () => {
+    const names = engine.query({ weaponGroups: ["firearm"] }).items.map((i) => i.name);
+    expect(names.sort()).toEqual(["Coldstar Pistols", "Dueling Pistol +1"]);
+  });
+
+  it("filters armor by category", () => {
+    const names = engine.query({ armorCategories: ["heavy"] }).items.map((i) => i.name);
+    expect(names).toEqual(["Fortress Plate"]);
+  });
+
+  it("OR-combines weapon groups and armor categories as one type axis", () => {
+    const names = engine.query({ weaponGroups: ["sword"], armorCategories: ["light"] }).items.map((i) => i.name);
+    expect(names.sort()).toEqual(["Flaming Longsword", "Glamered Leather"]);
+  });
+
+  it("keeps other categories AND-intersected with the type axis", () => {
+    // firearm weapons that are also unique → only Coldstar Pistols.
+    const names = engine
+      .query({ weaponGroups: ["firearm"], rarities: ["unique"] })
+      .items.map((i) => i.name);
+    expect(names).toEqual(["Coldstar Pistols"]);
   });
 });

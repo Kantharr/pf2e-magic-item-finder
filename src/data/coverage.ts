@@ -11,6 +11,31 @@ export const PACK_UUID_PREFIX = `Compendium.${EQUIPMENT_PACK_ID}.Item.`;
 /** The trait that marks the magical universe the map covers. */
 export const MAGICAL_TRAIT = "magical";
 
+/**
+ * Traits that mark an item as magical. PF2e stamps most magic items with the
+ * literal `magical` trait, but a magic-tradition trait (arcane/divine/occult/
+ * primal) and `artifact` each *imply* magic without necessarily co-listing
+ * `magical` — e.g. the unique artifact "Coldstar Pistols" carries `artifact`
+ * but not `magical`. Matching any of these keeps such items in the corpus.
+ */
+export const MAGICAL_MARKER_TRAITS: readonly string[] = [
+  MAGICAL_TRAIT,
+  "arcane",
+  "divine",
+  "occult",
+  "primal",
+  "artifact",
+];
+
+const MAGICAL_MARKER_SET = new Set(MAGICAL_MARKER_TRAITS);
+
+/** True when an item's trait list carries any {@link MAGICAL_MARKER_TRAITS}. */
+export function hasMagicalMarker(traits: readonly string[] | undefined): boolean {
+  if (!traits) return false;
+  for (const t of traits) if (MAGICAL_MARKER_SET.has(t)) return true;
+  return false;
+}
+
 /** How a map entry was resolved against the live pack (or that it wasn't). */
 export interface CoverageReport {
   /** Entries in the bundled map. */
@@ -81,7 +106,7 @@ async function readLiveMagicalItems(pack: unknown): Promise<LiveItem[]> {
   const items: LiveItem[] = [];
   for (const entry of index) {
     const traits = entry.system?.traits?.value ?? [];
-    if (!traits.includes(MAGICAL_TRAIT)) continue;
+    if (!hasMagicalMarker(traits)) continue;
     const name = entry.name ?? "(unnamed)";
     const indexSlug = entry.system?.slug ?? null;
     items.push({

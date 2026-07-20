@@ -14,39 +14,45 @@
         {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Count" total=results.total}}
       {{/if}}
     </div>
-    <div class="pf2e-mif-sort">
-      <label>{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Sort"}}
-        <select data-filter="sort">
-          {{#each sidebar.sortOptions}}
-          <option value="{{value}}"{{#if selected}} selected{{/if}}>{{label}}</option>
-          {{/each}}
-        </select>
-      </label>
-      <button type="button" class="pf2e-mif-sortdir" data-action="toggleSortDir"
-              data-dir="{{sidebar.sortDir}}" data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortDir"}}">
-        <i class="fa-solid {{#if sidebar.sortDirDesc}}fa-arrow-up-wide-short{{else}}fa-arrow-down-short-wide{{/if}}"></i>
+    {{!-- Export the current filtered set (not the whole index). Sorting now
+          lives on the clickable column headers below. --}}
+    <div class="pf2e-mif-export">
+      <button type="button" data-action="exportCsv" {{#if results.empty}}disabled{{/if}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.CsvTip"}}">
+        <i class="fa-solid fa-file-csv"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Csv"}}
       </button>
-      {{!-- Export the current filtered set (not the whole index). --}}
-      <div class="pf2e-mif-export">
-        <button type="button" data-action="exportCsv" {{#if results.empty}}disabled{{/if}}
-                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.CsvTip"}}">
-          <i class="fa-solid fa-file-csv"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Csv"}}
-        </button>
-        <button type="button" data-action="exportJson" {{#if results.empty}}disabled{{/if}}
-                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.JsonTip"}}">
-          <i class="fa-solid fa-file-code"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Json"}}
-        </button>
-      </div>
+      <button type="button" data-action="exportJson" {{#if results.empty}}disabled{{/if}}
+              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.JsonTip"}}">
+        <i class="fa-solid fa-file-code"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Json"}}
+      </button>
     </div>
   </div>
 
   <div class="pf2e-mif-results" tabindex="0" role="listbox"
        aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.List"}}">
-    <div class="pf2e-mif-row pf2e-mif-head" aria-hidden="true">
-      <span class="col-name">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Name"}}</span>
-      <span class="col-level">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Level"}}</span>
+    <div class="pf2e-mif-row pf2e-mif-head">
+      <span class="col-name pf2e-mif-sortable{{#if results.sort.name.active}} sorted{{/if}}"
+            role="button" tabindex="0" data-action="sortColumn" data-sort="name"
+            aria-sort="{{#if results.sort.name.asc}}ascending{{else}}{{#if results.sort.name.desc}}descending{{else}}none{{/if}}{{/if}}"
+            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Name"}}
+        <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.name.asc}}fa-caret-up{{else}}{{#if results.sort.name.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
+      </span>
+      <span class="col-level pf2e-mif-sortable{{#if results.sort.level.active}} sorted{{/if}}"
+            role="button" tabindex="0" data-action="sortColumn" data-sort="level"
+            aria-sort="{{#if results.sort.level.asc}}ascending{{else}}{{#if results.sort.level.desc}}descending{{else}}none{{/if}}{{/if}}"
+            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Level"}}
+        <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.level.asc}}fa-caret-up{{else}}{{#if results.sort.level.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
+      </span>
       <span class="col-rarity">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Rarity"}}</span>
-      <span class="col-price">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Price"}}</span>
+      <span class="col-price pf2e-mif-sortable{{#if results.sort.price.active}} sorted{{/if}}"
+            role="button" tabindex="0" data-action="sortColumn" data-sort="price"
+            aria-sort="{{#if results.sort.price.asc}}ascending{{else}}{{#if results.sort.price.desc}}descending{{else}}none{{/if}}{{/if}}"
+            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Price"}}
+        <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.price.asc}}fa-caret-up{{else}}{{#if results.sort.price.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
+      </span>
       <span class="col-traits">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Traits"}}</span>
     </div>
     {{#each results.rows}}

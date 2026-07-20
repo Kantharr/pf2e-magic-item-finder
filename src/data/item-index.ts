@@ -1,6 +1,6 @@
 import { MODULE_ID } from "../constants.js";
 import { sluggify } from "./sluggify.js";
-import { EQUIPMENT_PACK_ID, MAGICAL_TRAIT, PACK_UUID_PREFIX } from "./coverage.js";
+import { EQUIPMENT_PACK_ID, PACK_UUID_PREFIX, hasMagicalMarker } from "./coverage.js";
 import type { MatchMethod, TagMap, TagMapEntry } from "./tag-map.js";
 
 /**
@@ -18,6 +18,11 @@ const INDEX_FIELDS = [
   "system.price.value",
   "system.publication.title",
   "system.slug",
+  // Weapon/armor sub-type: `category` is simple/martial/advanced (weapons) or
+  // light/medium/heavy (armor); `group` is the weapon group (sword, firearm…)
+  // or armor group. Drives the weapon-group / armor-category filters.
+  "system.category",
+  "system.group",
 ] as const;
 
 /** Raw multi-denomination price object from `system.price.value` (any subset of keys). */
@@ -51,6 +56,12 @@ export interface IndexedItem {
   slug: string;
   img: string | null;
   type: string;
+  /** `system.category`: simple/martial/advanced (weapons) or light/medium/heavy
+   * (armor); `null` for items that carry no category. */
+  category: string | null;
+  /** `system.group`: the weapon group (sword, firearm…) or armor group; `null`
+   * when absent. */
+  group: string | null;
   /** Matched tag names (dictionary order); empty when unmatched. */
   tags: string[];
   /** Tag name → evidence snippet. */
@@ -105,6 +116,8 @@ interface RawItem {
   slug: string;
   img: string | null;
   type: string;
+  category: string | null;
+  group: string | null;
 }
 
 interface RawIndexEntry {
@@ -118,6 +131,8 @@ interface RawIndexEntry {
     traits?: { value?: string[]; rarity?: string };
     price?: { value?: RawPriceValue | null };
     publication?: { title?: string };
+    category?: string | null;
+    group?: string | null;
   };
 }
 
@@ -165,7 +180,7 @@ async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
   const items: RawItem[] = [];
   for (const entry of index) {
     const traits = entry.system?.traits?.value ?? [];
-    if (!traits.includes(MAGICAL_TRAIT)) continue;
+    if (!hasMagicalMarker(traits)) continue;
     const name = entry.name ?? "(unnamed)";
     const indexSlug = entry.system?.slug ?? null;
     items.push({
@@ -182,6 +197,8 @@ async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
       slug: indexSlug ?? sluggify(name),
       img: entry.img ?? null,
       type: entry.type ?? "equipment",
+      category: entry.system?.category ?? null,
+      group: entry.system?.group ?? null,
     });
   }
   return items;
@@ -236,6 +253,8 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
       slug: r.slug,
       img: r.img,
       type: r.type,
+      category: r.category,
+      group: r.group,
       tags,
       snippets: entry?.snippets ?? {},
       matchMethod: entry?.matchMethod ?? {},

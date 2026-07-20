@@ -22,6 +22,8 @@ function makeItem(partial: Partial<IndexedItem> & { name: string }): IndexedItem
     slug,
     img: null,
     type: "equipment",
+    category: null,
+    group: null,
     tags: partial.tags ?? [],
     snippets: {},
     matchMethod: {},

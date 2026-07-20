@@ -150,6 +150,13 @@ async function confirmDialog(title: string, content: string): Promise<boolean> {
   return globalThis.confirm?.(content) ?? false;
 }
 
+/** Sort state for one clickable results-column header. */
+interface SortHeaderVM {
+  active: boolean;
+  asc: boolean;
+  desc: boolean;
+}
+
 /** One results-row view model. */
 interface RowVM {
   uuid: string;
@@ -202,7 +209,9 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       toggleTag: MagicItemFinderApp.#onToggleTag,
       toggleRarity: MagicItemFinderApp.#onToggleRarity,
       toggleTrait: MagicItemFinderApp.#onToggleTrait,
-      toggleSortDir: MagicItemFinderApp.#onToggleSortDir,
+      toggleWeaponGroup: MagicItemFinderApp.#onToggleWeaponGroup,
+      toggleArmorCategory: MagicItemFinderApp.#onToggleArmorCategory,
+      sortColumn: MagicItemFinderApp.#onSortColumn,
       clearFilters: MagicItemFinderApp.#onClearFilters,
       selectItem: MagicItemFinderApp.#onSelectItem,
       openItem: MagicItemFinderApp.#onOpenItem,
@@ -256,8 +265,13 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
   /** Pending debounce timer for the search input. */
   #searchTimer: number | null = null;
 
-  /** Guard so the delegated (non-click) listeners attach to the root only once. */
-  #wired = false;
+  /** The root element the delegated (non-click) listeners are bound to, or null.
+   * Foundry builds a *new* frame element (and re-binds only its `data-action`
+   * clicks) whenever the app is rendered for the first time after a close, so a
+   * plain "wired once" boolean would leave a reopened window with dead
+   * change/input/keyboard/drag listeners. Tracking the actual element lets us
+   * re-bind whenever the frame is a different node. */
+  #wiredEl: HTMLElement | null = null;
 
   /** Drag-adjusted column widths (px), applied to `.window-content` as CSS vars
    * and re-applied after any full re-render. Null = use the CSS default. */
@@ -314,8 +328,8 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     const selTags = new Set(this.#filter.tags ?? []);
     const selRarities = new Set(this.#filter.rarities ?? []);
     const selTraits = new Set(this.#filter.traits ?? []);
-    const sort: SortField = this.#filter.sort ?? "name";
-    const sortDir = this.#filter.sortDir ?? "asc";
+    const selWeaponGroups = new Set(this.#filter.weaponGroups ?? []);
+    const selArmorCategories = new Set(this.#filter.armorCategories ?? []);
     const presets = listPresets();
     const hasActive = this.#activePreset != null && presets.some((p) => p.name === this.#activePreset);
     return {
@@ -329,6 +343,18 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
         active: selRarities.has(r),
       })),
       traits: options.traits.map((t) => ({ value: t, selected: selTraits.has(t) })),
+      weaponGroups: options.weaponGroups.map((g) => ({
+        value: g,
+        label: titleCase(g),
+        active: selWeaponGroups.has(g),
+      })),
+      hasWeaponGroups: options.weaponGroups.length > 0,
+      armorCategories: options.armorCategories.map((c) => ({
+        value: c,
+        label: titleCase(c),
+        active: selArmorCategories.has(c),
+      })),
+      hasArmorCategories: options.armorCategories.length > 0,
       levelRange: options.levelRange,
       priceRange: options.priceRange,
       minLevel: this.#filter.minLevel ?? "",
@@ -337,13 +363,6 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       maxPriceGp: this.#filter.maxPriceGp ?? "",
       includePriceless: this.#filter.includePriceless ?? false,
       text: this.#filter.text ?? "",
-      sortOptions: (["name", "level", "price", "relevance"] as SortField[]).map((f) => ({
-        value: f,
-        label: titleCase(f),
-        selected: f === sort,
-      })),
-      sortDir,
-      sortDirDesc: sortDir === "desc",
     };
   }
 
@@ -360,7 +379,21 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       pageSizeOptions: PAGE_SIZE_OPTIONS.map((n) => ({ value: n, selected: n === this.#pageSize })),
       canPrev: this.#page > 0,
       canNext: this.#page < totalPages - 1,
+      sort: this.#sortHeaders(),
     };
+  }
+
+  /** Per-column sort state for the clickable result headers. The effective field
+   * mirrors the engine's default (relevance while searching, else name). */
+  #sortHeaders(): { name: SortHeaderVM; level: SortHeaderVM; price: SortHeaderVM } {
+    const active: SortField = this.#filter.sort ?? (this.#filter.text ? "relevance" : "name");
+    const dir = this.#filter.sortDir ?? "asc";
+    const header = (field: SortField): SortHeaderVM => ({
+      active: field === active,
+      asc: field === active && dir === "asc",
+      desc: field === active && dir === "desc",
+    });
+    return { name: header("name"), level: header("level"), price: header("price") };
   }
 
   #rowVM(item: IndexedItem): RowVM {
@@ -486,10 +519,13 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
   /** Attach the non-click listeners once to the stable root element. Click
    * interactions go through the framework `actions` map instead. */
   #wireDelegated(): void {
-    if (this.#wired) return;
     const root = this.element;
     if (!(root instanceof HTMLElement)) return;
-    this.#wired = true;
+    // Already bound to this exact frame — nothing to do. A reopened window has a
+    // brand-new root element, so this correctly re-binds (the old element and
+    // its listeners are discarded with the closed frame).
+    if (this.#wiredEl === root) return;
+    this.#wiredEl = root;
 
     // Debounced free-text search.
     root.addEventListener("input", (ev) => {
@@ -576,9 +612,6 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       }
       case "includePriceless":
         this.#filter.includePriceless = (target as HTMLInputElement).checked || undefined;
-        break;
-      case "sort":
-        this.#filter.sort = (target as HTMLSelectElement).value as SortField;
         break;
     }
   }
@@ -687,12 +720,42 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onToggleSortDir(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
-    const next = (this.#filter.sortDir ?? "asc") === "asc" ? "desc" : "asc";
-    this.#filter.sortDir = next;
-    target.setAttribute("data-dir", next);
-    const icon = target.querySelector("i");
-    if (icon) icon.className = next === "asc" ? "fa-solid fa-arrow-down-short-wide" : "fa-solid fa-arrow-up-wide-short";
+  static #onToggleWeaponGroup(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+    const group = target.dataset.group;
+    if (!group) return;
+    const set = new Set(this.#filter.weaponGroups ?? []);
+    if (set.has(group)) set.delete(group);
+    else set.add(group);
+    this.#filter.weaponGroups = set.size ? [...set] : undefined;
+    target.classList.toggle("active", set.has(group));
+    target.setAttribute("aria-pressed", String(set.has(group)));
+    this.#markDirtyAndRenderResults();
+  }
+
+  static #onToggleArmorCategory(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+    const category = target.dataset.category;
+    if (!category) return;
+    const set = new Set(this.#filter.armorCategories ?? []);
+    if (set.has(category)) set.delete(category);
+    else set.add(category);
+    this.#filter.armorCategories = set.size ? [...set] : undefined;
+    target.classList.toggle("active", set.has(category));
+    target.setAttribute("aria-pressed", String(set.has(category)));
+    this.#markDirtyAndRenderResults();
+  }
+
+  /** Click a results column header: sort by it (asc), or flip direction if it is
+   * already the active sort field. */
+  static #onSortColumn(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+    const field = target.dataset.sort as SortField | undefined;
+    if (field !== "name" && field !== "level" && field !== "price") return;
+    const active: SortField = this.#filter.sort ?? (this.#filter.text ? "relevance" : "name");
+    if (field === active) {
+      this.#filter.sortDir = (this.#filter.sortDir ?? "asc") === "asc" ? "desc" : "asc";
+    } else {
+      this.#filter.sort = field;
+      this.#filter.sortDir = "asc";
+    }
     this.#markDirtyAndRenderResults();
   }
 
