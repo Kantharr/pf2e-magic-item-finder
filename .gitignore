@@ -7,3 +7,6 @@ release/
 phases/
 docs/
 TODO.md
+
+# Local release helper (kept out of the published module repo)
+scripts/release.ps1

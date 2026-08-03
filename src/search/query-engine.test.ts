@@ -274,6 +274,46 @@ describe("full-text ∩ structured", () => {
   });
 });
 
+describe("search spans names and descriptions", () => {
+  it("keeps name-only matches alongside body matches", () => {
+    // "boots" hits a name and nothing in any description body; "shadows" is
+    // carried only by a body. A single query has to surface both kinds.
+    expect(names({ text: "boots" })).toEqual(["Boots of Speed"]);
+    expect(names({ text: "shadows" })).toEqual(["Cloak of Elvenkind"]);
+  });
+
+  it("still intersects body matches with the structured filters", () => {
+    expect(names({ text: "cursed" }).sort()).toEqual(["Amulet of Fire", "Dagger of Doom"]);
+    expect(names({ text: "cursed", rarities: ["rare"] })).toEqual(["Dagger of Doom"]);
+  });
+
+  it("matches names only until setDescriptions supplies the body text", () => {
+    const index = makeIndex(SPECS);
+    const engine = createSearchEngine(index, { categories: CATEGORIES });
+    expect(engine.hasDescriptions).toBe(false);
+
+    // Names work immediately, so the window is usable while the descriptions
+    // are still loading; body-only terms simply find nothing yet.
+    expect(engine.query({ text: "boots" }).items.map((i) => i.name)).toEqual(["Boots of Speed"]);
+    expect(engine.query({ text: "cursed" }).total).toBe(0);
+
+    const descriptions: Record<string, string> = {};
+    for (const item of index.items) {
+      const spec = SPECS.find((s) => s.name === item.name);
+      if (spec?.description) descriptions[item.uuid] = spec.description;
+    }
+    engine.setDescriptions(descriptions);
+
+    // Once loaded, the same query widens to the body matches — and the name
+    // match still works.
+    expect(engine.hasDescriptions).toBe(true);
+    expect(
+      engine.query({ text: "cursed" }).items.map((i) => i.name).sort(),
+    ).toEqual(["Amulet of Fire", "Dagger of Doom"]);
+    expect(engine.query({ text: "boots" }).items.map((i) => i.name)).toEqual(["Boots of Speed"]);
+  });
+});
+
 describe("sorting is stable and correct", () => {
   it("sorts by name ascending by default", () => {
     expect(names({})).toEqual([

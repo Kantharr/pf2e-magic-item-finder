@@ -21,7 +21,13 @@ export type SortDir = "asc" | "desc";
 /** The composed filter state for a single query. Every field is optional; an
  * all-empty state matches the full magical list. */
 export interface FilterState {
-  /** Free-text query (name + description). Blank = no text filter. */
+  /**
+   * Free-text query, matched against item names **and** description bodies
+   * (name hits rank far higher). Description matching additionally requires the
+   * text to have been loaded into the engine
+   * ({@link SearchEngine.setDescriptions}); until then this matches names only.
+   * Blank = no text filter.
+   */
   text?: string;
   /** Selected ability-tag names (OR within). Empty = any tags. */
   tags?: readonly string[];
@@ -114,7 +120,8 @@ export interface SearchEngineOptions {
    * uuid → plain-text description, folded into the full-text index alongside
    * name. Descriptions are fetched lazily in Foundry (large payloads), so they
    * are injected here rather than read by the engine. Absent entries index by
-   * name only.
+   * name only. Omit this to start name-only and supply them later via
+   * {@link SearchEngine.setDescriptions}.
    */
   descriptions?: Record<string, string>;
 }
@@ -147,14 +154,36 @@ export function createSearchEngine(
 
 export class SearchEngine {
   private readonly index: ItemIndex;
-  private readonly mini: MiniSearch<TextDoc>;
+  private mini: MiniSearch<TextDoc>;
+  /** True once non-empty description text has been indexed (at construction or
+   * via {@link setDescriptions}) — description-scoped queries are meaningless
+   * before that. */
+  private descriptionsLoaded: boolean;
   /** Precomputed option lists for the UI. */
   readonly options: FilterOptionLists;
 
   constructor(index: ItemIndex, opts: SearchEngineOptions = {}) {
     this.index = index;
-    this.mini = buildTextIndex(index.items, opts.descriptions ?? {});
+    const descriptions = opts.descriptions ?? {};
+    this.mini = buildTextIndex(index.items, descriptions);
+    this.descriptionsLoaded = Object.keys(descriptions).length > 0;
     this.options = buildOptionLists(index, opts.categories);
+  }
+
+  /** Whether description text is available to the full-text index. */
+  get hasDescriptions(): boolean {
+    return this.descriptionsLoaded;
+  }
+
+  /**
+   * Fold descriptions into the full-text index after construction — they are
+   * fetched lazily in Foundry (large payloads), so the engine starts name-only
+   * and is upgraded on demand when the user first asks to search descriptions.
+   * Rebuilds the MiniSearch index in place; queries afterwards see both fields.
+   */
+  setDescriptions(descriptions: Record<string, string>): void {
+    this.mini = buildTextIndex(this.index.items, descriptions);
+    this.descriptionsLoaded = Object.keys(descriptions).length > 0;
   }
 
   /**

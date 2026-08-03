@@ -1,5 +1,10 @@
 import { MODULE_ID } from "../constants.js";
-import { fetchItemDescription, type IndexedItem } from "../data/item-index.js";
+import {
+  fetchItemDescription,
+  loadItemDescriptions,
+  type IndexedItem,
+  type ItemIndex,
+} from "../data/item-index.js";
 import {
   coerceAppliedState,
   deletePreset,
@@ -39,6 +44,13 @@ function currentEngine(): SearchEngine | null {
   const api = (game.modules?.get(MODULE_ID) as unknown as { api?: { searchEngine?: SearchEngine | null } } | undefined)
     ?.api;
   return api?.searchEngine ?? null;
+}
+
+/** Resolve the module's live item index, or null before it is built. */
+function currentIndex(): ItemIndex | null {
+  const api = (game.modules?.get(MODULE_ID) as unknown as { api?: { itemIndex?: ItemIndex | null } } | undefined)
+    ?.api;
+  return api?.itemIndex ?? null;
 }
 
 /** Enrich description HTML (inline links, etc.). Falls back to the raw HTML. */
@@ -262,6 +274,11 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
   /** uuid → enriched description HTML, memoized for the detail pane. */
   #descriptionCache = new Map<string, string | null>();
 
+  /** The in-flight (or settled) bulk description load backing description-scoped
+   * search, so a rapid re-tick can't start a second pass over the pack.
+   * Resolves false when the load failed. Reset when the index is rebuilt. */
+  #descriptionLoad: Promise<boolean> | null = null;
+
   /** Pending debounce timer for the search input. */
   #searchTimer: number | null = null;
 
@@ -448,10 +465,73 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   /** Resolve an item by uuid from the live index (for out-of-page selection). */
   #lookup(uuid: string): IndexedItem | null {
-    const api = (game.modules?.get(MODULE_ID) as unknown as {
-      api?: { itemIndex?: { byUuid?: Map<string, IndexedItem> } | null };
-    } | undefined)?.api;
-    return api?.itemIndex?.byUuid?.get(uuid) ?? null;
+    return currentIndex()?.byUuid.get(uuid) ?? null;
+  }
+
+  // ---- description text for full-text search --------------------------------
+
+  /**
+   * Pull the description bodies into the text index so the search box matches
+   * them as well as item names. The engine is built name-only (descriptions are
+   * large, and loading them at `ready` would tax every world load for a window
+   * that may never be opened), so this runs once when the window is first
+   * opened — early enough that it is usually done before the user finishes
+   * typing, and off the critical path of the first render.
+   */
+  #beginDescriptionLoad(): void {
+    const engine = currentEngine();
+    if (!engine || engine.hasDescriptions || this.#descriptionLoad) return;
+    ui.notifications?.info(
+      t("PF2E_MAGIC_ITEM_FINDER.Filter.LoadingDescriptions", "Loading item descriptions…"),
+    );
+    this.#requeryWhenDescriptionsReady();
+  }
+
+  /**
+   * Kick off (or join) the description load and re-run the current query once it
+   * lands, so a search typed while the text was still loading widens to include
+   * description matches instead of silently staying name-only. A failed load
+   * leaves the engine name-only; {@link #loadDescriptions} has already told the
+   * user why.
+   */
+  #requeryWhenDescriptionsReady(): void {
+    void this.#ensureDescriptions().then((ok) => {
+      if (!ok) return;
+      this.#resultDirty = true;
+      if (this.rendered) void this.render({ parts: ["results"] });
+    });
+  }
+
+  /** Load descriptions into the live engine once; subsequent calls reuse the
+   * same promise (and short-circuit entirely once they are in the index). */
+  async #ensureDescriptions(): Promise<boolean> {
+    const engine = currentEngine();
+    if (!engine) return false;
+    if (engine.hasDescriptions) return true;
+    this.#descriptionLoad ??= this.#loadDescriptions();
+    return this.#descriptionLoad;
+  }
+
+  async #loadDescriptions(): Promise<boolean> {
+    const engine = currentEngine();
+    const index = currentIndex();
+    if (!engine || !index) return false;
+    try {
+      engine.setDescriptions(await loadItemDescriptions(index));
+      return true;
+    } catch (err) {
+      console.error(`${MODULE_ID} | failed to load item descriptions`, err);
+      ui.notifications?.error(
+        t(
+          "PF2E_MAGIC_ITEM_FINDER.Filter.DescriptionsFailed",
+          "Could not load item descriptions; search will match item names only.",
+        ),
+      );
+      // Drop the memo so a later attempt can retry rather than replaying the
+      // failure forever.
+      this.#descriptionLoad = null;
+      return false;
+    }
   }
 
   /** Fetch + enrich (and memoize) an item's description HTML. */
@@ -469,6 +549,8 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     await super._onRender?.(context as never, options as never);
     this.#wireDelegated();
     this.#applyWidths();
+    // No-ops after the first call (and once the text is in the index).
+    this.#beginDescriptionLoad();
   }
 
   /** Re-apply drag-adjusted column widths to `.window-content` after a render. */
@@ -679,7 +761,11 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#page = 0;
     this.#resultDirty = true;
     this.#descriptionCache.clear();
+    // The rebuilt engine starts name-only again, so the description text has to
+    // be pulled back in before searches cover it once more.
+    this.#descriptionLoad = null;
     if (this.rendered) void this.render({ parts: ["sidebar", "results", "detail"] });
+    this.#beginDescriptionLoad();
   }
 
   // ---- click actions (framework-delegated) ---------------------------------

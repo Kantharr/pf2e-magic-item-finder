@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "pf2eSystemVersion": "8.3.0",
-  "generatedAt": "2026-07-12T19:49:23Z",
-  "itemCount": 3328,
+  "pf2eSystemVersion": "8.4.0",
+  "generatedAt": "2026-08-03T01:22:01Z",
+  "itemCount": 3488,
   "tags": {
     "Compendium.pf2e.equipment-srd.Item.R09AZzvyNA3Jginm": {
       "slug": "abadars-flawless-scale",
@@ -1533,6 +1533,19 @@
         "Stat/skill bonus": "structured"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.syP1LQvUppCOO9ws": {
+      "slug": "arcing-hand-crossbow",
+      "name": "Arcing Hand Crossbow",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.nSG5bwiZBEjj53Ya": {
       "slug": "arctic-vigor-greater",
       "name": "Arctic Vigor (Greater)",
@@ -2678,6 +2691,32 @@
         "Temporary HP": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.twoixuegpjAwbjld": {
+      "slug": "beetle-gel-greater",
+      "name": "Beetle Gel (Greater)",
+      "tags": [
+        "Polymorph/shapechange"
+      ],
+      "snippets": {
+        "Polymorph/shapechange": "…bject grows iridescent insect wings and transforms into a , keeping some of the same colo…"
+      },
+      "matchMethod": {
+        "Polymorph/shapechange": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.xBNg6XqMUM9jCuCN": {
+      "slug": "beetle-gel",
+      "name": "Beetle Gel",
+      "tags": [
+        "Polymorph/shapechange"
+      ],
+      "snippets": {
+        "Polymorph/shapechange": "…bject grows iridescent insect wings and transforms into a , keeping some of the same colo…"
+      },
+      "matchMethod": {
+        "Polymorph/shapechange": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.4BDf1LVyQyNyOwka": {
       "slug": "beguiling-crown",
       "name": "Beguiling Crown",
@@ -2828,7 +2867,7 @@
         "Polymorph/shapechange"
       ],
       "snippets": {
-        "Polymorph/shapechange": "…from time to time. Activate 1 envision (polymorph, transmutation) Frequency once per day…"
+        "Polymorph/shapechange": "…Activate—Shifting Form 1 (concentrate, polymorph) Frequency once per day Requirements Yo…"
       },
       "matchMethod": {
         "Polymorph/shapechange": "regex"
@@ -3344,6 +3383,22 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.eGcYnfO7MkQ646E9": {
+      "slug": "blessed-lantern-flail",
+      "name": "Blessed Lantern Flail",
+      "tags": [
+        "Grants/casts a spell",
+        "Light source"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…the creature must succeed at a flat to Cast a Spell. Failure As success, but the effect las…",
+        "Light source": "rule:TokenLight"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Light source": "structured"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.y0ngvQ7ArcUuoEHT": {
       "slug": "blessed-tattoo",
       "name": "Blessed Tattoo",
@@ -3774,15 +3829,12 @@
       "slug": "book-of-lingering-blaze",
       "name": "Book of Lingering Blaze",
       "tags": [
-        "Grants/casts a spell",
         "Resistance"
       ],
       "snippets": {
-        "Grants/casts a spell": "…er day Effect If your next action is to Cast a Spell dealing fire damage that you prepared f…",
         "Resistance": "…, allowing the spell to ignore up to 10 resistance to fire of creatures affected by the spell…"
       },
       "matchMethod": {
-        "Grants/casts a spell": "regex",
         "Resistance": "regex"
       }
     },
@@ -4020,6 +4072,13 @@
     "Compendium.pf2e.equipment-srd.Item.7TQw7V1zZKl0a0Xz": {
       "slug": "bottled-air",
       "name": "Bottled Air",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Q9eMehKFlxMc9qoQ": {
+      "slug": "bottled-melody",
+      "name": "Bottled Melody",
       "tags": [],
       "snippets": {},
       "matchMethod": {}
@@ -6374,41 +6433,23 @@
     "Compendium.pf2e.equipment-srd.Item.PMCk6NCDvJs1MBcg": {
       "slug": "codebreakers-parchment-greater",
       "name": "Codebreaker's Parchment (Greater)",
-      "tags": [
-        "Illusion"
-      ],
-      "snippets": {
-        "Illusion": "trait:illusion"
-      },
-      "matchMethod": {
-        "Illusion": "structured"
-      }
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.UlvlWbC7iipuENa1": {
       "slug": "codebreakers-parchment-major",
       "name": "Codebreaker's Parchment (Major)",
-      "tags": [
-        "Illusion"
-      ],
-      "snippets": {
-        "Illusion": "trait:illusion"
-      },
-      "matchMethod": {
-        "Illusion": "structured"
-      }
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.pkD8SLooxP55tibr": {
       "slug": "codebreakers-parchment",
       "name": "Codebreaker's Parchment",
-      "tags": [
-        "Illusion"
-      ],
-      "snippets": {
-        "Illusion": "trait:illusion"
-      },
-      "matchMethod": {
-        "Illusion": "structured"
-      }
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.AVBhZdhq6qCp96Se": {
       "slug": "codex-of-destruction-and-renewal",
@@ -6470,6 +6511,19 @@
     "Compendium.pf2e.equipment-srd.Item.Dk7cs7rj82ORgxFg": {
       "slug": "commandants-scabbard",
       "name": "Commandant's Scabbard",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Mi9zCb0x3M40C0kL": {
+      "slug": "commanders-signet",
+      "name": "Commander's Signet",
       "tags": [
         "Stat/skill bonus"
       ],
@@ -6669,7 +6723,7 @@
         "Grants/casts a spell"
       ],
       "snippets": {
-        "Grants/casts a spell": "…energy. Activate r envision Trigger You Cast a Spell from a spell slot, and the spell has th…"
+        "Grants/casts a spell": "…sorb Arcana r (concentrate) Trigger You Cast a Spell from a spell slot, and the spell has th…"
       },
       "matchMethod": {
         "Grants/casts a spell": "regex"
@@ -6782,6 +6836,45 @@
     "Compendium.pf2e.equipment-srd.Item.pASszbK2LjpNUJY1": {
       "slug": "conundrum-spectacles",
       "name": "Conundrum Spectacles",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.QyR2zHM3tChs6I6M": {
+      "slug": "convincing-greater",
+      "name": "Convincing (Greater)",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.0IlAAtOLgJ4kA537": {
+      "slug": "convincing-major",
+      "name": "Convincing (Major)",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ft3Iejj2UlqH4J3J": {
+      "slug": "convincing",
+      "name": "Convincing",
       "tags": [
         "Stat/skill bonus"
       ],
@@ -7075,11 +7168,11 @@
         "Illusion"
       ],
       "snippets": {
-        "Stat/skill bonus": "…t of a gesture when you , you gain a +2 item bonus to your Deception check. Activate—Shimm…",
+        "Stat/skill bonus": "rule:FlatModifier",
         "Illusion": "trait:illusion"
       },
       "matchMethod": {
-        "Stat/skill bonus": "regex",
+        "Stat/skill bonus": "structured",
         "Illusion": "structured"
       }
     },
@@ -7788,6 +7881,19 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.F0DM6K3cGjE7aaSg": {
+      "slug": "debilitating-dart",
+      "name": "Debilitating Dart",
+      "tags": [
+        "Immunity"
+      ],
+      "snippets": {
+        "Immunity": "…within 1 round. The target then becomes immune to this effect for 24 hours."
+      },
+      "matchMethod": {
+        "Immunity": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.aBVrNIPoPGOYxm80": {
       "slug": "decanter-of-endless-water",
       "name": "Decanter of Endless Water",
@@ -7850,11 +7956,11 @@
         "Polymorph/shapechange"
       ],
       "snippets": {
-        "Illusion": "trait:illusion",
+        "Illusion": "…till in the deck or failing to hold the illusion at a critical moment. If a deck becomes…",
         "Polymorph/shapechange": "…o activate the deck, you can illusorily transform the ace and face cards into other cards…"
       },
       "matchMethod": {
-        "Illusion": "structured",
+        "Illusion": "regex",
         "Polymorph/shapechange": "regex"
       }
     },
@@ -7905,6 +8011,13 @@
       "matchMethod": {
         "Stat/skill bonus": "structured"
       }
+    },
+    "Compendium.pf2e.equipment-srd.Item.djfRlJTck2pVnIjA": {
+      "slug": "deflecting",
+      "name": "Deflecting",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.i9hF185TRK0cH8B4": {
       "slug": "demolishing",
@@ -9714,7 +9827,7 @@
       ],
       "snippets": {
         "Resistance": "rule:Resistance",
-        "Healing": "…xudes outward. Each ally in a emanation regains 30 Hit Points and gains a +3 status bonus to Fortitud…"
+        "Healing": "…outward. Each ally in a type:emanation regains 30 healing Hit Points and gains a +3 status bonus to Fortitud…"
       },
       "matchMethod": {
         "Resistance": "structured",
@@ -10199,6 +10312,44 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.h6JfPh8XEjH9HlDk": {
+      "slug": "energy-vulnerability-greater",
+      "name": "Energy Vulnerability (Greater)",
+      "tags": [
+        "Resistance",
+        "Weakness",
+        "Immunity"
+      ],
+      "snippets": {
+        "Resistance": "…sn't affect a creature with immunity or resistance to that energy type.",
+        "Weakness": "…This weakness isn't cumulative with any weakness to that energy type the target already has…",
+        "Immunity": "…has and doesn't affect a creature with immunity or resistance to that energy type."
+      },
+      "matchMethod": {
+        "Resistance": "regex",
+        "Weakness": "regex",
+        "Immunity": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Nu7RhPPOyUcRjUDy": {
+      "slug": "energy-vulnerability",
+      "name": "Energy Vulnerability",
+      "tags": [
+        "Resistance",
+        "Weakness",
+        "Immunity"
+      ],
+      "snippets": {
+        "Resistance": "…sn't affect a creature with immunity or resistance to that energy type.",
+        "Weakness": "…This weakness isn't cumulative with any weakness to that energy type the target already has…",
+        "Immunity": "…has and doesn't affect a creature with immunity or resistance to that energy type."
+      },
+      "matchMethod": {
+        "Resistance": "regex",
+        "Weakness": "regex",
+        "Immunity": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.Y0oi9tSJYgfEQIxt": {
       "slug": "enfilading-arrow",
       "name": "Enfilading Arrow",
@@ -10596,6 +10747,22 @@
       "matchMethod": {
         "Resistance": "structured",
         "Weakness": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.lfrhhbTG1nf0fNAQ": {
+      "slug": "evercursed-crystal",
+      "name": "Evercursed Crystal",
+      "tags": [
+        "Stat/skill bonus",
+        "Light source"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier",
+        "Light source": "…in Bastardhall, it remains harmless and sheds light as an everlight crystal . As soon as a…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured",
+        "Light source": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.mRz8Jmk4Q06SsZpC": {
@@ -11005,6 +11172,19 @@
       "tags": [],
       "snippets": {},
       "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Rn0Mk8dB3AjdK1Lt": {
+      "slug": "fan-of-the-four-winds",
+      "name": "Fan of the Four Winds",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…irling air. The vessel gains a +10-foot circumstance bonus to its Speed for 8 hours."
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
     },
     "Compendium.pf2e.equipment-srd.Item.cvb47A6K1w7RfNiv": {
       "slug": "fanged-greater",
@@ -11755,6 +11935,13 @@
         "Aura effect": "structured"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.bWFubxY5J82D5qbY": {
+      "slug": "flame-layer-balm",
+      "name": "Flame Layer Balm",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.4Pmo9gc81JAOzdke": {
       "slug": "flame-navette",
       "name": "Flame Navette",
@@ -11856,7 +12043,7 @@
         "Stat/skill bonus"
       ],
       "snippets": {
-        "Stat/skill bonus": "…with lemon, for example. You gain a +1 item bonus on your Diplomacy check. The GM can dis…"
+        "Stat/skill bonus": "…with lemon, for example. You gain a +1 item bonus on your Diplomacy check to Make an Impr…"
       },
       "matchMethod": {
         "Stat/skill bonus": "regex"
@@ -12218,6 +12405,19 @@
         "Immunity": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.soKrw4q93V0ePsgj": {
+      "slug": "fortunes-favor",
+      "name": "Fortune's Favor",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…istracting it can be, granting you a +1 item bonus on Deception checks made to and on Game…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.6R3e78H9YwzmMbjF": {
       "slug": "fossil-fragment-amber-mosquito",
       "name": "Fossil Fragment (Amber Mosquito)",
@@ -12544,7 +12744,7 @@
         "Illusion"
       ],
       "snippets": {
-        "Invisibility": "…he fulus themselves) gain the effect of Invisibility Sphere, but only against creatures…",
+        "Invisibility": "…circle instead of an emanation and the invisibility is only effective against creature…",
         "Illusion": "trait:illusion"
       },
       "matchMethod": {
@@ -12870,6 +13070,19 @@
         "Stat/skill bonus": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.SxyhYuj3sl4CIxwJ": {
+      "slug": "generals-signet",
+      "name": "General's Signet",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.Tej7JTxvq1K0qGYn": {
       "slug": "generals-word",
       "name": "General's Word",
@@ -13156,7 +13369,7 @@
       ],
       "snippets": {
         "Stat/skill bonus": "rule:FlatModifier",
-        "Illusion": "…entity, the glasses don't penetrate the disguise. If a doppelganger was disguised as an…"
+        "Illusion": "…entity, the glasses don't penetrate the disguise. For example, if a divoynik was disguis…"
       },
       "matchMethod": {
         "Stat/skill bonus": "structured",
@@ -13218,7 +13431,7 @@
         "Teleportation"
       ],
       "snippets": {
-        "Teleportation": "…your hand. Activate 2 Interact (shadow, teleportation) Frequency once per hour Effect Yo…"
+        "Teleportation": "…unt 2 (concentrate, manipulate, shadow, teleportation) Frequency once per hour Effect Yo…"
       },
       "matchMethod": {
         "Teleportation": "regex"
@@ -13823,7 +14036,7 @@
         "Grants/casts a spell"
       ],
       "snippets": {
-        "Grants/casts a spell": "…resistance 5 to void. Weapon After you Cast a Spell by Activating the sandglass , your Stri…"
+        "Grants/casts a spell": "…resistance 5 to void. Weapon After you Cast a Spell by Activating the hourglass, your Strik…"
       },
       "matchMethod": {
         "Grants/casts a spell": "regex"
@@ -13836,7 +14049,7 @@
         "Grants/casts a spell"
       ],
       "snippets": {
-        "Grants/casts a spell": "…resistance 10 to void. Weapon After you Cast a Spell by Activating the sandglass , your Stri…"
+        "Grants/casts a spell": "…resistance 10 to void. Weapon After you Cast a Spell by Activating the hourglass, your Strik…"
       },
       "matchMethod": {
         "Grants/casts a spell": "regex"
@@ -13849,7 +14062,7 @@
         "Grants/casts a spell"
       ],
       "snippets": {
-        "Grants/casts a spell": "…resistance 2 to void. Weapon After you Cast a Spell by Activating the sandglass , your Stri…"
+        "Grants/casts a spell": "…resistance 2 to void. Weapon After you Cast a Spell by Activating the hourglass, your Strik…"
       },
       "matchMethod": {
         "Grants/casts a spell": "regex"
@@ -14394,9 +14607,25 @@
       "snippets": {},
       "matchMethod": {}
     },
-    "Compendium.pf2e.equipment-srd.Item.3M7iB9tfrsWTccZ0": {
+    "Compendium.pf2e.equipment-srd.Item.ZxkTbyq61JTQ7Zkt": {
       "slug": "healers-gel-greater",
       "name": "Healer's Gel (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell An astringent aroma from rare succulent…",
+        "Temporary HP": "…ent to a spell bestows an additional 10 temporary Hit Points to one target healed by the spell. Thes…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.3M7iB9tfrsWTccZ0": {
+      "slug": "healers-gel-major",
+      "name": "Healer's Gel (Major)",
       "tags": [
         "Grants/casts a spell",
         "Temporary HP"
@@ -14411,8 +14640,8 @@
       }
     },
     "Compendium.pf2e.equipment-srd.Item.q8aRbsKX93R5AXNb": {
-      "slug": "healers-gel-lesser",
-      "name": "Healer's Gel (Lesser)",
+      "slug": "healers-gel",
+      "name": "Healer's Gel",
       "tags": [
         "Grants/casts a spell",
         "Temporary HP"
@@ -14420,22 +14649,6 @@
       "snippets": {
         "Grants/casts a spell": "Activate Cast a Spell An astringent aroma from rare succulent…",
         "Temporary HP": "…nent to a spell bestows an additional 5 temporary Hit Points to one target healed by the spell. Thes…"
-      },
-      "matchMethod": {
-        "Grants/casts a spell": "regex",
-        "Temporary HP": "regex"
-      }
-    },
-    "Compendium.pf2e.equipment-srd.Item.ZxkTbyq61JTQ7Zkt": {
-      "slug": "healers-gel-moderate",
-      "name": "Healer's Gel (Moderate)",
-      "tags": [
-        "Grants/casts a spell",
-        "Temporary HP"
-      ],
-      "snippets": {
-        "Grants/casts a spell": "Activate Cast a Spell An astringent aroma from rare succulent…",
-        "Temporary HP": "…ent to a spell bestows an additional 10 temporary Hit Points to one target healed by the spell. Thes…"
       },
       "matchMethod": {
         "Grants/casts a spell": "regex",
@@ -15354,6 +15567,20 @@
         "Polymorph/shapechange": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.9v8O16eyTMiSGVmr": {
+      "slug": "ice-gliders-greater",
+      "name": "Ice Gliders (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.c8hgn34pOwUjMTnk": {
+      "slug": "ice-gliders",
+      "name": "Ice Gliders",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.ibA3FykNQcoEPfPC": {
       "slug": "icy-disposition",
       "name": "Icy Disposition",
@@ -15891,6 +16118,13 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.AUVNxFeognmids36": {
+      "slug": "inventors-chair",
+      "name": "Inventor's Chair",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.B3QOvE43Qn1H8t8n": {
       "slug": "inventors-fulu",
       "name": "Inventor's Fulu",
@@ -15953,7 +16187,7 @@
         "Invisibility"
       ],
       "snippets": {
-        "Invisibility": "This +2 resilient chain shirt is itself invisible. Other creatures can't see it at all,…"
+        "Invisibility": "This +2 resilient invisibility chain shirt is itself invisible. O…"
       },
       "matchMethod": {
         "Invisibility": "regex"
@@ -17469,6 +17703,27 @@
         "Illusion": "structured"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.cVvQF7YlNbLlqJ3T": {
+      "slug": "lockpickers-oil-greater",
+      "name": "Lockpicker's Oil (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.znxeqERU9FN58lfR": {
+      "slug": "lockpickers-oil-major",
+      "name": "Lockpicker's Oil (Major)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.xTGARos1ETjnbR2H": {
+      "slug": "lockpickers-oil",
+      "name": "Lockpicker's Oil",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.5sBRskeiJgEBtcJw": {
       "slug": "locust-leather",
       "name": "Locust Leather",
@@ -17513,6 +17768,19 @@
       },
       "matchMethod": {
         "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ZTXXhSGXHCgYr6cy": {
+      "slug": "look-me-not",
+      "name": "Look-Me-Not",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "trait:illusion"
+      },
+      "matchMethod": {
+        "Illusion": "structured"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.hUhH5QeSZ8B7Yg65": {
@@ -18940,7 +19208,7 @@
       ],
       "snippets": {
         "Stat/skill bonus": "rule:FlatModifier",
-        "Teleportation": "…ivate 2 command, envision (conjuration, teleportation) Frequency once per day Effect The…"
+        "Teleportation": "…ctivate—Wandering Twirl 2 (concentrate, teleportation) Frequency once per day Effect The…"
       },
       "matchMethod": {
         "Stat/skill bonus": "structured",
@@ -19257,6 +19525,19 @@
         "Illusion": "structured"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.B18ZjBdOW7zBDzvX": {
+      "slug": "mirrorblade",
+      "name": "Mirrorblade",
+      "tags": [
+        "Invisibility"
+      ],
+      "snippets": {
+        "Invisibility": "…ed by a shimmering field that makes you invisible to scrying magic for 1 hour. In addit…"
+      },
+      "matchMethod": {
+        "Invisibility": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.NBmOTmE2GAEI766h": {
       "slug": "misdirecting-haversack",
       "name": "Misdirecting Haversack",
@@ -19341,6 +19622,13 @@
       "matchMethod": {
         "Healing": "regex"
       }
+    },
+    "Compendium.pf2e.equipment-srd.Item.DDdYXpxPtjvnJLJH": {
+      "slug": "mobile",
+      "name": "Mobile",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.4j3mNtQNTzWs4vNW": {
       "slug": "mockers-swazzle",
@@ -19518,6 +19806,45 @@
       },
       "matchMethod": {
         "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Lf4j51ICwt4zgxnj": {
+      "slug": "moonweave-greater",
+      "name": "Moonweave (Greater)",
+      "tags": [
+        "Healing"
+      ],
+      "snippets": {
+        "Healing": "…ls you repeatedly over a duration would restore additional Hit Points only once, when you're first healed."
+      },
+      "matchMethod": {
+        "Healing": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.2SeX2vfTta5EL8x4": {
+      "slug": "moonweave-major",
+      "name": "Moonweave (Major)",
+      "tags": [
+        "Healing"
+      ],
+      "snippets": {
+        "Healing": "…ls you repeatedly over a duration would restore additional Hit Points only once, when you're first healed."
+      },
+      "matchMethod": {
+        "Healing": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.PV2TxKcs09x9BfCc": {
+      "slug": "moonweave",
+      "name": "Moonweave",
+      "tags": [
+        "Healing"
+      ],
+      "snippets": {
+        "Healing": "…ls you repeatedly over a duration would restore additional Hit Points only once, when you're first healed."
+      },
+      "matchMethod": {
+        "Healing": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.7LsU8hLtDwiC6Fsy": {
@@ -21215,6 +21542,13 @@
         "Stat/skill bonus": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.G1FOTNhO1qcPfRXW": {
+      "slug": "phantom-fang",
+      "name": "Phantom Fang",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.WUICjaC9LYnLRIAE": {
       "slug": "phantom-shroud",
       "name": "Phantom Shroud",
@@ -21294,6 +21628,13 @@
       "matchMethod": {
         "Stat/skill bonus": "regex"
       }
+    },
+    "Compendium.pf2e.equipment-srd.Item.NI2wcQsM3juLYdEz": {
+      "slug": "phistophilus-fiddle",
+      "name": "Phistophilus Fiddle",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.lSwITRpBSdodhc1c": {
       "slug": "phoenix-fighting-fan",
@@ -21702,6 +22043,45 @@
       },
       "matchMethod": {
         "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.nijFNyYKIUqgtzMi": {
+      "slug": "possums-play-greater",
+      "name": "Possum's Play (Greater)",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "trait:illusion"
+      },
+      "matchMethod": {
+        "Illusion": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.5eKLWz5KgJioeWk4": {
+      "slug": "possums-play-major",
+      "name": "Possum's Play (Major)",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "trait:illusion"
+      },
+      "matchMethod": {
+        "Illusion": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Cmqao1h8JkpzS8o7": {
+      "slug": "possums-play",
+      "name": "Possum's Play",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "trait:illusion"
+      },
+      "matchMethod": {
+        "Illusion": "structured"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.aSRUX4WGfalK4A5J": {
@@ -22294,8 +22674,8 @@
         "Polymorph/shapechange"
       ],
       "snippets": {
-        "Stat/skill bonus": "…+25). For the next hour, you gain a +3 item bonus against transmutation effects, which is…",
-        "Polymorph/shapechange": "…nsmutation effects, which is +4 against polymorph effects. If you roll a success against…"
+        "Stat/skill bonus": "…+25). For the next hour, you gain a +4 item bonus against morph and polymorph effects. If…",
+        "Polymorph/shapechange": "…gain a +4 item bonus against morph and polymorph effects. If you roll a success against…"
       },
       "matchMethod": {
         "Stat/skill bonus": "regex",
@@ -22310,8 +22690,8 @@
         "Polymorph/shapechange"
       ],
       "snippets": {
-        "Stat/skill bonus": "…+17). For the next hour, you gain a +2 item bonus against transmutation effects, which is…",
-        "Polymorph/shapechange": "…nsmutation effects, which is +3 against polymorph effects. If you roll a success against…"
+        "Stat/skill bonus": "…+17). For the next hour, you gain a +3 item bonus against morph and polymorph effects. If…",
+        "Polymorph/shapechange": "…gain a +3 item bonus against morph and polymorph effects. If you roll a success against…"
       },
       "matchMethod": {
         "Stat/skill bonus": "regex",
@@ -22938,6 +23318,19 @@
       },
       "matchMethod": {
         "Aura effect": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.TsE8sWkRX3Btvgd5": {
+      "slug": "quicksilver-cloak",
+      "name": "Quicksilver Cloak",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.KnZL0xPWDzQx9vWQ": {
@@ -23745,7 +24138,7 @@
         "Teleportation"
       ],
       "snippets": {
-        "Teleportation": "…hen you activate the prism, immediately teleports into your hand. The retrieval prism ca…"
+        "Teleportation": "…ossession of 1 Bulk or less immediately teleports into your hand. The retrieval prism ca…"
       },
       "matchMethod": {
         "Teleportation": "regex"
@@ -24542,6 +24935,13 @@
         "Teleportation": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.f4GQdPIDAl058wfs": {
+      "slug": "safeguarding",
+      "name": "Safeguarding",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.wXFSigsdLO8zjgXo": {
       "slug": "sages-bloom",
       "name": "Sage's Bloom",
@@ -24560,15 +24960,18 @@
       "name": "Sage's Lash",
       "tags": [
         "Stat/skill bonus",
-        "Healing"
+        "Healing",
+        "Invisibility"
       ],
       "snippets": {
         "Stat/skill bonus": "rule:FlatModifier",
-        "Healing": "…y) Speak \"lenity\" to have each creature regain 30 Hit Points. Amethyst (divination, light, revelatio…"
+        "Healing": "…y) Think \"lenity\" to have each creature regain 30 healing Hit Points. Turquoise Think \"clarity\" to grant all…",
+        "Invisibility": "…manation. For 1 round, if they would be invisible, they become instead, and if they wou…"
       },
       "matchMethod": {
         "Stat/skill bonus": "structured",
-        "Healing": "regex"
+        "Healing": "regex",
+        "Invisibility": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.IOj7cNqBU6nG08tB": {
@@ -24634,6 +25037,13 @@
     "Compendium.pf2e.equipment-srd.Item.ZEKmCg8K2hUHbmnT": {
       "slug": "salve-of-antiparalysis",
       "name": "Salve of Antiparalysis",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.yjo27OfqAW7qcR9O": {
+      "slug": "salve-of-mental-pattern",
+      "name": "Salve of Mental Pattern",
       "tags": [],
       "snippets": {},
       "matchMethod": {}
@@ -25471,6 +25881,13 @@
         "Stat/skill bonus": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.48tdInl0iSnUA5JA": {
+      "slug": "self-sealing",
+      "name": "Self-Sealing",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.n528aLyM5kli91XG": {
       "slug": "semaphore-of-slanders",
       "name": "Semaphore of Slanders",
@@ -26208,6 +26625,13 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.E4iDTr5likUCR6gz": {
+      "slug": "sidestepping",
+      "name": "Sidestepping",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.idcfnKHZvJTSCdWK": {
       "slug": "siege-shield",
       "name": "Siege Shield",
@@ -26506,7 +26930,7 @@
         "Healing"
       ],
       "snippets": {
-        "Healing": "…antment, healing, mental) Each creature regains 5d10 healing Hit Points and gains a +1 status bonus to saves ag…"
+        "Healing": "…emotion, healing, mental) Each creature regains 5d10 healing Hit Points and gains a +1 status bonus to saves ag…"
       },
       "matchMethod": {
         "Healing": "regex"
@@ -26519,7 +26943,7 @@
         "Healing"
       ],
       "snippets": {
-        "Healing": "…antment, healing, mental) Each creature regains 3d10 healing Hit Points and gains a +1 status bonus to saves ag…"
+        "Healing": "…emotion, healing, mental) Each creature regains 3d10 healing Hit Points and gains a +1 status bonus to saves ag…"
       },
       "matchMethod": {
         "Healing": "regex"
@@ -26843,6 +27267,19 @@
       "tags": [],
       "snippets": {},
       "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.JNOKoVNCwRT1aIhm": {
+      "slug": "sleuths-pipe",
+      "name": "Sleuth's Pipe",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…eps within the pipe, it grants you a +1 item bonus to Perception checks to , and if you're…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
     },
     "Compendium.pf2e.equipment-srd.Item.LiJMupjynmkM5Mld": {
       "slug": "slick-greater",
@@ -27746,7 +28183,7 @@
         "Grants/casts a spell"
       ],
       "snippets": {
-        "Grants/casts a spell": "…antment spell but retain the ability to cast the enchantment spell again."
+        "Grants/casts a spell": "…mental spell but retain the ability to Cast the mental Spell again."
       },
       "matchMethod": {
         "Grants/casts a spell": "regex"
@@ -28107,6 +28544,13 @@
       "matchMethod": {
         "Invisibility": "regex"
       }
+    },
+    "Compendium.pf2e.equipment-srd.Item.BqPCFtfMyR0CIAcP": {
+      "slug": "spiral-labyrinth",
+      "name": "Spiral Labyrinth",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     },
     "Compendium.pf2e.equipment-srd.Item.w492F18MtpqNu2X7": {
       "slug": "spirit-bulb-greater",
@@ -29007,13 +29451,16 @@
       "slug": "staff-of-natures-cunning",
       "name": "Staff of Nature's Cunning",
       "tags": [
-        "Grants/casts a spell"
+        "Grants/casts a spell",
+        "Stat/skill bonus"
       ],
       "snippets": {
-        "Grants/casts a spell": "…hing them to come to your aid. Activate Cast a Spell Effect You expend a number of charges f…"
+        "Grants/casts a spell": "…em bonus to Nature checks to . Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 item bonus to Nature checks to . Activate Cast a S…"
       },
       "matchMethod": {
-        "Grants/casts a spell": "regex"
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.gca5Pgt9Pg8G23VA": {
@@ -29652,45 +30099,6 @@
       "matchMethod": {
         "Grants/casts a spell": "regex",
         "Resistance": "structured"
-      }
-    },
-    "Compendium.pf2e.equipment-srd.Item.aBAU0sTkFLuTxO3X": {
-      "slug": "staff-storing-shield-greater",
-      "name": "Staff-Storing Shield (Greater)",
-      "tags": [
-        "Polymorph/shapechange"
-      ],
-      "snippets": {
-        "Polymorph/shapechange": "…a blank face. It can absorb a staff and transform between a shield and staff. When you pr…"
-      },
-      "matchMethod": {
-        "Polymorph/shapechange": "regex"
-      }
-    },
-    "Compendium.pf2e.equipment-srd.Item.nhCHLI5SnJXF3fQE": {
-      "slug": "staff-storing-shield-major",
-      "name": "Staff-Storing Shield (Major)",
-      "tags": [
-        "Polymorph/shapechange"
-      ],
-      "snippets": {
-        "Polymorph/shapechange": "…a blank face. It can absorb a staff and transform between a shield and staff. When you pr…"
-      },
-      "matchMethod": {
-        "Polymorph/shapechange": "regex"
-      }
-    },
-    "Compendium.pf2e.equipment-srd.Item.xAOVPVH6cX3iVFlk": {
-      "slug": "staff-storing-shield-true",
-      "name": "Staff-Storing Shield (True)",
-      "tags": [
-        "Polymorph/shapechange"
-      ],
-      "snippets": {
-        "Polymorph/shapechange": "…a blank face. It can absorb a staff and transform between a shield and staff. When you pr…"
-      },
-      "matchMethod": {
-        "Polymorph/shapechange": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.EBcZ7ftWs8lVW7Fj": {
@@ -30389,10 +30797,10 @@
         "Illusion"
       ],
       "snippets": {
-        "Illusion": "trait:illusion"
+        "Illusion": "…tory. Activate—Hoodwink r (concentrate, illusion) Frequency once per day Trigger A creat…"
       },
       "matchMethod": {
-        "Illusion": "structured"
+        "Illusion": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.XPcTty0E1jh4OIzT": {
@@ -30528,15 +30936,12 @@
       "slug": "summoning-handscroll",
       "name": "Summoning Handscroll",
       "tags": [
-        "Grants/casts a spell",
         "Temporary HP"
       ],
       "snippets": {
-        "Grants/casts a spell": "…er day Effect If your next action is to Cast a Spell prepared from this spellbook that summo…",
         "Temporary HP": "…energies, causing it to arrive with 10 temporary Hit Points that last for up to 1 minute."
       },
       "matchMethod": {
-        "Grants/casts a spell": "regex",
         "Temporary HP": "regex"
       }
     },
@@ -30600,6 +31005,45 @@
       },
       "matchMethod": {
         "Illusion": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.mDEkOSueuDOFW6V2": {
+      "slug": "sunweave-greater",
+      "name": "Sunweave (Greater)",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.yYCZXExIR7b9PO4V": {
+      "slug": "sunweave-major",
+      "name": "Sunweave (Major)",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.81Ejj6xXLN3l6uDb": {
+      "slug": "sunweave",
+      "name": "Sunweave",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.toest6lPgkXHI3cy": {
@@ -32191,6 +32635,13 @@
         "Flight": "regex"
       }
     },
+    "Compendium.pf2e.equipment-srd.Item.Hm28TJuWdEcjGTSy": {
+      "slug": "three-bird-pinion",
+      "name": "Three Bird Pinion",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
     "Compendium.pf2e.equipment-srd.Item.1INJVAVazL6p4gea": {
       "slug": "three-days-breath",
       "name": "Three Day's Breath",
@@ -33614,6 +34065,19 @@
       "matchMethod": {
         "Stat/skill bonus": "structured",
         "Illusion": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.lVNAswkvRe2ZxKPQ": {
+      "slug": "unnerving",
+      "name": "Unnerving",
+      "tags": [
+        "Polymorph/shapechange"
+      ],
+      "snippets": {
+        "Polymorph/shapechange": "…nging against a suit of unnerving armor transforms into an inhuman screech that unsettles…"
+      },
+      "matchMethod": {
+        "Polymorph/shapechange": "regex"
       }
     },
     "Compendium.pf2e.equipment-srd.Item.3YnHsf98MAe3lcdH": {
@@ -37132,6 +37596,19 @@
       "snippets": {},
       "matchMethod": {}
     },
+    "Compendium.pf2e.equipment-srd.Item.hCJZR7LeEs9ezHN0": {
+      "slug": "watch-of-lost-ages",
+      "name": "Watch of Lost Ages",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…a time spell. The relic grants you a +1 item bonus to about historical subjects."
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
     "Compendium.pf2e.equipment-srd.Item.1LJ0KMAyjwx4iP1Q": {
       "slug": "watchers-armband",
       "name": "Watcher's Armband",
@@ -38263,6 +38740,1453 @@
       "matchMethod": {
         "Stat/skill bonus": "structured"
       }
+    },
+    "Compendium.pf2e.equipment-srd.Item.yN3gSN3kgdT5c5Wv": {
+      "slug": "arclords-codex",
+      "name": "Arclord's Codex",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Em3oz8qQuh8gs0Ru": {
+      "slug": "bloodstained-treatise",
+      "name": "Bloodstained Treatise",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.pZZ8bkPlGRWIJJIr": {
+      "slug": "book-of-endless-walls",
+      "name": "Book of Endless Walls",
+      "tags": [
+        "Immunity"
+      ],
+      "snippets": {
+        "Immunity": "…of the results, the target then becomes immune to Bewildering Walls for 24 hours. Critica…"
+      },
+      "matchMethod": {
+        "Immunity": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ilSgHaxCoLWAzTzC": {
+      "slug": "calligraphic-illumination",
+      "name": "Calligraphic Illumination",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…re or object that you can see with a +2 item bonus to the check."
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.5AOVzpKmDReSkk7a": {
+      "slug": "chapbook-of-terrors-greater",
+      "name": "Chapbook of Terrors (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Y5bmYYRnbPBIFaer": {
+      "slug": "chapbook-of-terrors-major",
+      "name": "Chapbook of Terrors (Major)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.oR6z1PeCaDzijg40": {
+      "slug": "chapbook-of-terrors",
+      "name": "Chapbook of Terrors",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Z9SqZ8y76VgX9V1D": {
+      "slug": "grudge-journal",
+      "name": "Grudge Journal",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.uCVYrThkqUhkYaeM": {
+      "slug": "psalter-of-the-blessed",
+      "name": "Psalter of the Blessed",
+      "tags": [
+        "Fast healing / regeneration"
+      ],
+      "snippets": {
+        "Fast healing / regeneration": "…d all allies within 30 feet of you gain fast healing 5 and a +1 status bonus to AC and savin…"
+      },
+      "matchMethod": {
+        "Fast healing / regeneration": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.y9qzr4zKfnWg9tpO": {
+      "slug": "radiant-tome",
+      "name": "Radiant Tome",
+      "tags": [
+        "Immunity"
+      ],
+      "snippets": {
+        "Immunity": "…e is unaffected and becomes temporarily immune to this bright light for 1 minute. Success…"
+      },
+      "matchMethod": {
+        "Immunity": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.OPOxrngmyQh4ctj8": {
+      "slug": "sparking-grimoire-greater",
+      "name": "Sparking Grimoire (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.hx7aQv58VZueUvlJ": {
+      "slug": "sparking-grimoire",
+      "name": "Sparking Grimoire",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.hPKaa4dZbMfFCCIo": {
+      "slug": "verdant-leaves-greater",
+      "name": "Verdant Leaves (Greater)",
+      "tags": [
+        "Extra sense"
+      ],
+      "snippets": {
+        "Extra sense": "…out incantations. It carries the earthy scent of a forest floor. Activate—Nature's Re…"
+      },
+      "matchMethod": {
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.H7QHJRqTM7rqB05Q": {
+      "slug": "verdant-leaves-major",
+      "name": "Verdant Leaves (Major)",
+      "tags": [
+        "Extra sense"
+      ],
+      "snippets": {
+        "Extra sense": "…out incantations. It carries the earthy scent of a forest floor. Activate—Nature's Re…"
+      },
+      "matchMethod": {
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Av7rFMsdTjSA6Ls9": {
+      "slug": "verdant-leaves",
+      "name": "Verdant Leaves",
+      "tags": [
+        "Extra sense"
+      ],
+      "snippets": {
+        "Extra sense": "…out incantations. It carries the earthy scent of a forest floor. Activate—Nature's Re…"
+      },
+      "matchMethod": {
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.JXNXkYtYIcbiLnnK": {
+      "slug": "whispering-spirit-tome",
+      "name": "Whispering Spirit Tome",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.Uq1mOFaOx9HamrRs": {
+      "slug": "daybreak-ammunition",
+      "name": "Daybreak Ammunition",
+      "tags": [
+        "Extra sense",
+        "Aura effect"
+      ],
+      "snippets": {
+        "Extra sense": "…ttempt a fortitude save. Creatures with darkvision take a –2 circumstance penalty to this…",
+        "Aura effect": "…ts a target, the missile flares with an aura of bright light in a type:emanation fro…"
+      },
+      "matchMethod": {
+        "Extra sense": "regex",
+        "Aura effect": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.FcwaLx6YSJhwQEAs": {
+      "slug": "disruption-ammunition-greater",
+      "name": "Disruption Ammunition (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.lVsxg17O9XIKEczc": {
+      "slug": "disruption-ammunition",
+      "name": "Disruption Ammunition",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.ESoFQI0V3h0oLowQ": {
+      "slug": "escalation-ammunition",
+      "name": "Escalation Ammunition",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.f7swvmM1zeGNzO02": {
+      "slug": "gravebane-ammunition-greater",
+      "name": "Gravebane Ammunition (Greater)",
+      "tags": [
+        "Bonus damage dice"
+      ],
+      "snippets": {
+        "Bonus damage dice": "rule:DamageDice"
+      },
+      "matchMethod": {
+        "Bonus damage dice": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.KvRuh3yhNiTRunnV": {
+      "slug": "gravebane-ammunition",
+      "name": "Gravebane Ammunition",
+      "tags": [
+        "Bonus damage dice"
+      ],
+      "snippets": {
+        "Bonus damage dice": "rule:DamageDice"
+      },
+      "matchMethod": {
+        "Bonus damage dice": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.0Wu0vvURh6FefRyV": {
+      "slug": "magekiller-bullet",
+      "name": "Magekiller Bullet",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…1 hour, the counteract check gains a +4 circumstance bonus."
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.G411ErUAIfMMlOMz": {
+      "slug": "runeveil-ammunition",
+      "name": "Runeveil Ammunition",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.aExm45aCAqzF1Tj2": {
+      "slug": "shatterpoint-ammunition-greater",
+      "name": "Shatterpoint Ammunition (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.yoSK6PAtgv0DDkAP": {
+      "slug": "shatterpoint-ammunition-major",
+      "name": "Shatterpoint Ammunition (Major)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.QMJryxEtM9mWijDy": {
+      "slug": "shatterpoint-ammunition",
+      "name": "Shatterpoint Ammunition",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.g8dQyXkWspCy8Az6": {
+      "slug": "wormhole-shot",
+      "name": "Wormhole Shot",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.FXOfnxr6co6rUmoq": {
+      "slug": "accoutrements-of-bone",
+      "name": "Accoutrements of Bone",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.cGgN41q4Qo9taiOR": {
+      "slug": "chained-mist",
+      "name": "Chained Mist",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.bpZjOL370dgKAO6Q": {
+      "slug": "crystal-lattice",
+      "name": "Crystal Lattice",
+      "tags": [
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Temporary HP": "…eton that covers your form. You gain 20 temporary Hit Points that last for 1 hour. The exoskeleton c…"
+      },
+      "matchMethod": {
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.p2ai0q9DTgZcsqdM": {
+      "slug": "energy-shield-tunic-greater",
+      "name": "Energy Shield Tunic (Greater)",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.cIHNyUEYmUs9V7kV": {
+      "slug": "energy-shield-tunic",
+      "name": "Energy Shield Tunic",
+      "tags": [
+        "Resistance"
+      ],
+      "snippets": {
+        "Resistance": "rule:Resistance"
+      },
+      "matchMethod": {
+        "Resistance": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.5Be4sNTgLQDKe7xm": {
+      "slug": "laboratory-coat",
+      "name": "Laboratory Coat",
+      "tags": [
+        "Stat/skill bonus",
+        "Teleportation"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier",
+        "Teleportation": "…uick Escape 2 (concentrate, manipulate, teleportation) Frequency once per day Effect You…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured",
+        "Teleportation": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.slzJdwOimxyENTcY": {
+      "slug": "suit-of-false-impression",
+      "name": "Suit of False Impression",
+      "tags": [
+        "Stat/skill bonus",
+        "Illusion"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "rule:FlatModifier",
+        "Illusion": "trait:illusion"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "structured",
+        "Illusion": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.29rJcxvQtN9MAhOD": {
+      "slug": "archers-bulwark",
+      "name": "Archer's Bulwark",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…u Raise a Shield with this buckler, the circumstance bonus to AC it grants against ranged Strikes…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.CyziWjcM1NaAgTFa": {
+      "slug": "cowards-shield",
+      "name": "Coward's Shield",
+      "tags": [
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Stat/skill bonus": "…ct light that touches it. You gain a +1 circumstance bonus to Stealth checks to [[/act hide]] whil…"
+      },
+      "matchMethod": {
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.7wrDxwY3FEdZacUf": {
+      "slug": "emergency-escape-shield",
+      "name": "Emergency Escape Shield",
+      "tags": [
+        "Teleportation"
+      ],
+      "snippets": {
+        "Teleportation": "…tivate—Desperate Flight f (concentrate, teleportation) Frequency once per day Trigger Yo…"
+      },
+      "matchMethod": {
+        "Teleportation": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.YgKFtPFDIdNilqtm": {
+      "slug": "resolute-shield",
+      "name": "Resolute Shield",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.1TfWS6mCf3DJXiiX": {
+      "slug": "shield-of-endurance",
+      "name": "Shield of Endurance",
+      "tags": [
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Temporary HP": "…t You Raise the Shield, and it gains 10 temporary Hit Points that last for 1 minute."
+      },
+      "matchMethod": {
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.RdVXWMxgvs8WmrXH": {
+      "slug": "shield-of-mental-fortitude",
+      "name": "Shield of Mental Fortitude",
+      "tags": [
+        "Resistance"
+      ],
+      "snippets": {
+        "Resistance": "rule:Resistance"
+      },
+      "matchMethod": {
+        "Resistance": "structured"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.TFo8aHfh12MRGi3Q": {
+      "slug": "shield-of-silent-words",
+      "name": "Shield of Silent Words",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…e this shield raised, if you attempt to Cast a Spell or perform an action that has the audit…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Ng5tI5xt2LGm6yty": {
+      "slug": "shield-of-the-bear",
+      "name": "Shield of the Bear",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.f13q3i96zu2AfjJ8": {
+      "slug": "spellshock-shield",
+      "name": "Spellshock Shield",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.tfBXnTfPvIiCY3L9": {
+      "slug": "stifling-shield",
+      "name": "Stifling Shield",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.wp3siHKmzOt6fRpU": {
+      "slug": "verdant-buckler",
+      "name": "Verdant Buckler",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.96ycBGEff6em8DaY": {
+      "slug": "backdraft-bead",
+      "name": "Backdraft Bead",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) Swirling winds shift and…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.V8tDjHLg5ruW4TxQ": {
+      "slug": "consecrated-shield",
+      "name": "Consecrated Shield",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) Metals blessed in song b…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.6dnIy0ahSqSWydbG": {
+      "slug": "couriers-cryptex",
+      "name": "Courier's Cryptex",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) This ornate cryptex, mad…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.nV5h2izQUbpicEO8": {
+      "slug": "discordant-strings",
+      "name": "Discordant Strings",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Strings used during a mediocre performa…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.58AcWx0Mz80nS0vb": {
+      "slug": "echoing-theater",
+      "name": "Echoing Theater",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell This small diorama is fashioned like a…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.46tt6ngbBfSYXcmS": {
+      "slug": "frigid-rebuke",
+      "name": "Frigid Rebuke",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Rust and frost eat away at the surface…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.qou8QqD5PanOHYVC": {
+      "slug": "ghostly-legerdemain",
+      "name": "Ghostly Legerdemain",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Patterns shift subtly on the surface of…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.XmQUnnEw2JsOlwax": {
+      "slug": "hundred-stings",
+      "name": "Hundred Stings",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Golden bee-shaped charms with deceptive…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.WK05v9zAYWMRFHbS": {
+      "slug": "leaden-weight",
+      "name": "Leaden Weight",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) This simple lead weight…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.BIKe37KMVn8gYkqM": {
+      "slug": "literate-lemur",
+      "name": "Literate Lemur",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell This carved effigy of a lemur clutches…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ofQKyx3Db9nr73Vh": {
+      "slug": "mistwalkers-instinct",
+      "name": "Mistwalker's Instinct",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Wisps of fog and mist waft from this sm…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.L6sFZz6WEdBelzQM": {
+      "slug": "odious-token",
+      "name": "Odious Token",
+      "tags": [
+        "Grants/casts a spell",
+        "Immunity"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) This small, silver disc…",
+        "Immunity": "…pose of the spell. Additionally, you're immune to the spell and able to approach the ally…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Immunity": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Zb9bdDMOKQZby7A9": {
+      "slug": "preserved-alecost",
+      "name": "Preserved Alecost",
+      "tags": [
+        "Grants/casts a spell",
+        "Extra sense"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell A faint scent of sweetness and bitterne…",
+        "Extra sense": "Activate Cast a Spell A faint scent of sweetness and bitterness wafts from…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.4nTmNq8YMt0jUNrT": {
+      "slug": "steel-cloud-road",
+      "name": "Steel Cloud Road",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell (add 1 action) This carved iron cloud a…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.AgnhkMpzcl3z8ift": {
+      "slug": "stolen-countenance",
+      "name": "Stolen Countenance",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Blood stains this performer's mask, whi…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.s18sbTjXwD43N00x": {
+      "slug": "undertakers-spade",
+      "name": "Undertaker's Spade",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Rites of rest are etched deep into the…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.AtGOz5nEtzWQ4DBM": {
+      "slug": "wardens-eye",
+      "name": "Warden's Eye",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "Activate Cast a Spell Runes of scrying mark the iris of this…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.oMVgH2B0z5jrmg4Q": {
+      "slug": "all-seeing-eye-greater",
+      "name": "All-Seeing Eye (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Illusion"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…nd take the new result. reflex Activate Cast a Spell Effect You cast . Activate Cast a Spell…",
+        "Illusion": "…or You gain resistance 4 to damage from illusion effects. Weapon (fortune) After you cas…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Illusion": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.183Vw2yy4sRqYRe3": {
+      "slug": "all-seeing-eye",
+      "name": "All-Seeing Eye",
+      "tags": [
+        "Grants/casts a spell",
+        "Illusion"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…ll it and take the new result. Activate Cast a Spell Effect You cast .",
+        "Illusion": "…or You gain resistance 2 to damage from illusion effects. Weapon (fortune) After you cas…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Illusion": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.45w6peqIyNJQIyhR": {
+      "slug": "cerebral-barbell-greater",
+      "name": "Cerebral Barbell (Greater)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.HB4SeNTvRkuJnbUF": {
+      "slug": "cerebral-barbell-major",
+      "name": "Cerebral Barbell (Major)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Hfvlk4v3bhumZamu": {
+      "slug": "cerebral-barbell",
+      "name": "Cerebral Barbell",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…til the end of your next turn. Activate Cast a Spell Effect You cast ."
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.alz5KwsKdNGJFrXS": {
+      "slug": "cheery-chime-greater",
+      "name": "Cheery Chime (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…he end of your next turn. will Activate Cast a Spell Effect You cast Activate Cast a Spell E…",
+        "Stat/skill bonus": "…ing the item is 24. Armor You gain a +2 item bonus to saving throws against emotion effect…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.IJKAx5lvmT8tdOAA": {
+      "slug": "cheery-chime-major",
+      "name": "Cheery Chime (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…he end of your next turn. will Activate Cast a Spell Effect You cast Activate Cast a Spell E…",
+        "Stat/skill bonus": "…ing the item is 34. Armor You gain a +3 item bonus to saving throws against emotion effect…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.WiuMwJV4LHejvcsp": {
+      "slug": "cheery-chime",
+      "name": "Cheery Chime",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…til the end of your next turn. Activate Cast a Spell Effect You cast",
+        "Stat/skill bonus": "…a soothing breeze. Armor You gain a +1 item bonus to saving throws against emotion effect…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.x3CwKJRvualWEtYd": {
+      "slug": "deathbane-crescent-greater",
+      "name": "Deathbane Crescent (Greater)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…d of your next turn. fortitude Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.s1XvmIDgzCS9buol": {
+      "slug": "deathbane-crescent-major",
+      "name": "Deathbane Crescent (Major)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…d of your next turn. fortitude Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.3w97KyfZlni8UZAt": {
+      "slug": "deathbane-crescent",
+      "name": "Deathbane Crescent",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…d of your next turn. fortitude Activate Cast a Spell Effect You cast ."
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.AxW9mJMsANxHM3fQ": {
+      "slug": "energizing-vial-greater",
+      "name": "Energizing Vial (Greater)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast Activate Cast a Spell F…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ZkXHrYuCQvQcXB4X": {
+      "slug": "energizing-vial-major",
+      "name": "Energizing Vial (Major)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast Activate Cast a Spell F…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.il21KgU7BjYlnaUD": {
+      "slug": "energizing-vial",
+      "name": "Energizing Vial",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…til the end of your next turn. Activate Cast a Spell Effect You cast"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.BwVniUj63Jx2gQGC": {
+      "slug": "helping-hand-greater",
+      "name": "Helping Hand (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…Aid when wielding the weapon. Activate Cast a Spell Effect You cast . Activate Cast a Spell…",
+        "Stat/skill bonus": "…d Bulk limit by 2. Weapon You gain a +2 item bonus to skill checks to Aid when wielding th…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.axQMs6Dmb4DAmwBA": {
+      "slug": "helping-hand-major",
+      "name": "Helping Hand (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…Aid when wielding the weapon. Activate Cast a Spell Effect You cast . Activate Cast a Spell…",
+        "Stat/skill bonus": "…d Bulk limit by 3. Weapon You gain a +2 item bonus to skill checks to Aid when wielding th…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.YaeCWcCqWUOi8n1y": {
+      "slug": "helping-hand",
+      "name": "Helping Hand",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…Aid when wielding the weapon. Activate Cast a Spell Effect You cast .",
+        "Stat/skill bonus": "…d Bulk limit by 1. Weapon You gain a +1 item bonus to skill checks to Aid when wielding th…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.9d65hIWkqp73r5kq": {
+      "slug": "hydrating-pinwheel-greater",
+      "name": "Hydrating Pinwheel (Greater)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Jnhvy5jKPpAFxkrd": {
+      "slug": "hydrating-pinwheel-major",
+      "name": "Hydrating Pinwheel (Major)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…end of your next turn. reflex Activate Cast a Spell Effect You cast . Activate Cast a Spell…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.6KSvDOocytrgkRDb": {
+      "slug": "hydrating-pinwheel",
+      "name": "Hydrating Pinwheel",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…til the end of your next turn. Activate Cast a Spell Effect You cast ."
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.JeDblE7P3ITCsjcV": {
+      "slug": "silver-tongue-greater",
+      "name": "Silver Tongue (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…he end of your next turn. will Activate Cast a Spell Effect You cast . Activate Cast a Spell…",
+        "Stat/skill bonus": "…ng this item is 34. Armor You gain a +3 item bonus to saving throws against auditory and l…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.HKnsPxrmgSPdHXAQ": {
+      "slug": "silver-tongue",
+      "name": "Silver Tongue",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…he end of your next turn. will Activate Cast a Spell Effect You cast .",
+        "Stat/skill bonus": "…ng this item is 24. Armor You gain a +2 item bonus to saving throws against auditory and l…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.GulGtcZpkKlr2VgB": {
+      "slug": "thirsty-chalice-greater",
+      "name": "Thirsty Chalice (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…vating this item is 22. Armor After you cast a spell by Activating the chalice, you are surr…",
+        "Temporary HP": "…fully deal this void damage, you gain 8 temporary Hit Points that last for 1 minute. fortitude Activ…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.kAGxPZdxDxBOi2dO": {
+      "slug": "thirsty-chalice-major",
+      "name": "Thirsty Chalice (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…vating this item is 35. Armor After you cast a spell by Activating the chalice, you are surr…",
+        "Temporary HP": "…ully deal this void damage, you gain 16 temporary Hit Points that last for 1 minute. fortitude Activ…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.DQhYNMR0g17psFQq": {
+      "slug": "thirsty-chalice",
+      "name": "Thirsty Chalice",
+      "tags": [
+        "Grants/casts a spell",
+        "Temporary HP"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…pense of their enemies. Armor After you cast a spell by Activating the chalice, you are surr…",
+        "Temporary HP": "…fully deal this void damage, you gain 4 temporary Hit Points that last for 1 minute. Activate Cast a…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Temporary HP": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.8qCrpn4pAjfSwRgm": {
+      "slug": "birchstaff-greater",
+      "name": "Birchstaff (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…shove]], or [[/act trip]] you. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to your Fortitude DC against attempts t…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.bnkQ7zSAmuW0azf1": {
+      "slug": "birchstaff-major",
+      "name": "Birchstaff (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…shove]], or [[/act trip]] you. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to your Fortitude DC against attempts t…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.4oOmIQQTJW88JfU3": {
+      "slug": "birchstaff",
+      "name": "Birchstaff",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…shove]], or [[/act trip]] you. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to your Fortitude DC against attempts t…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.dlnAvDH2frZF23l8": {
+      "slug": "continuum-staff",
+      "name": "Continuum Staff",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…the better of the two results. Activate Cast a Spell Effect You expend a number of charges f…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.QIyNSdh4v2vmGdH0": {
+      "slug": "corrosive-staff-greater",
+      "name": "Corrosive Staff (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Extra sense"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…n resistance 6 to acid damage. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Extra sense": "…s hollow glass staff, carrying an acrid scent. While wielding the staff, you gain res…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.dmnwpn8Ot9OVW7wY": {
+      "slug": "corrosive-staff-major",
+      "name": "Corrosive Staff (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Extra sense"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…n resistance 9 to acid damage. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Extra sense": "…s hollow glass staff, carrying an acrid scent. While wielding the staff, you gain res…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.2BErYoyOCnRBQGEj": {
+      "slug": "corrosive-staff",
+      "name": "Corrosive Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Extra sense"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…n resistance 3 to acid damage. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Extra sense": "…s hollow glass staff, carrying an acrid scent. While wielding the staff, you gain res…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.OzX0dVe3C50xJAm6": {
+      "slug": "fanged-staff",
+      "name": "Fanged Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…g throws against void effects. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…wielding a fanged staff, you gain a +2 circumstance bonus to saving throws against void effects.…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.MoxAqfNzUvEmIy5e": {
+      "slug": "fey-staff-greater",
+      "name": "Fey Staff (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…creatures with the fey trait. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to Deception and Diplomacy checks again…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.XxaNwktHoAXVk694": {
+      "slug": "fey-staff-major",
+      "name": "Fey Staff (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…creatures with the fey trait. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to Deception and Diplomacy checks again…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.edAiZ7A9ojZpP7Xe": {
+      "slug": "fey-staff",
+      "name": "Fey Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…creatures with the fey trait. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to Deception and Diplomacy checks again…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.r9XpnfBfQZhUq3Fh": {
+      "slug": "memento-mori-staff",
+      "name": "Memento Mori Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Extra sense"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…ect for a maximum of 1 minute. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Extra sense": "…hite ash staff, which carries the faint scent of funereal herbs. These staves are oft…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Extra sense": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.NsD23QENeWxASSUu": {
+      "slug": "quotidian-staff-greater",
+      "name": "Quotidian Staff (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…re checks about food or drink. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to Lore checks about food or drink. Act…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.3IPMjCJbkFdXjNaQ": {
+      "slug": "quotidian-staff",
+      "name": "Quotidian Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…re checks about food or drink. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding the staff, you gain a +2 circumstance bonus to Lore checks about food or drink. Act…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.4ANdxkBpdBVOUa7r": {
+      "slug": "staff-of-encroaching-shadows-greater",
+      "name": "Staff of Encroaching Shadows (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…hile in dim light or darkness. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…hile wielding this staff, you gain a +2 circumstance bonus to Stealth checks while in dim light or…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.AUcS3DusEWtmxZOM": {
+      "slug": "staff-of-encroaching-shadows-major",
+      "name": "Staff of Encroaching Shadows (Major)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…hile in dim light or darkness. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…hile wielding this staff, you gain a +2 circumstance bonus to Stealth checks while in dim light or…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.kC4GmC5IVxO24tbH": {
+      "slug": "staff-of-encroaching-shadows",
+      "name": "Staff of Encroaching Shadows",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…hile in dim light or darkness. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…hile wielding this staff, you gain a +2 circumstance bonus to Stealth checks while in dim light or…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.o4yul8PJpZgbkupW": {
+      "slug": "staff-of-the-mages-friend-greater",
+      "name": "Staff of the Mage's Friend (Greater)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…uage, with a range of 30 feet. Activate Cast a Spell Effect You expend a number of charges f…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.tDkMBFkTVHSMC9PM": {
+      "slug": "staff-of-the-mages-friend-major",
+      "name": "Staff of the Mage's Friend (Major)",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…uage, with a range of 30 feet. Activate Cast a Spell Effect You expend a number of charges f…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.V7ZhF0iSuXyM8jAD": {
+      "slug": "staff-of-the-mages-friend",
+      "name": "Staff of the Mage's Friend",
+      "tags": [
+        "Grants/casts a spell"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…uage, with a range of 30 feet. Activate Cast a Spell Effect You expend a number of charges f…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.OPoF3jdcwSmKtAo2": {
+      "slug": "wanderers-staff-greater",
+      "name": "Wanderer’s Staff (Greater)",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…ection or Subsist in the wild. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding this staff, you get a +2 circumstance bonus to Survival checks to Sense Direction o…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.ThHsWkYUy77eQXJi": {
+      "slug": "wanderers-staff",
+      "name": "Wanderer’s Staff",
+      "tags": [
+        "Grants/casts a spell",
+        "Stat/skill bonus"
+      ],
+      "snippets": {
+        "Grants/casts a spell": "…ection or Subsist in the wild. Activate Cast a Spell Effect You expend a number of charges f…",
+        "Stat/skill bonus": "…While wielding this staff, you get a +2 circumstance bonus to Survival checks to Sense Direction o…"
+      },
+      "matchMethod": {
+        "Grants/casts a spell": "regex",
+        "Stat/skill bonus": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.zWltrTj5mkDgdZiN": {
+      "slug": "arclord-eye",
+      "name": "Arclord Eye",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "…cal effects and their traits. Deceptive illusion magic is not detectable by this magic s…"
+      },
+      "matchMethod": {
+        "Illusion": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.pwuQ3QWVEO42hfWQ": {
+      "slug": "chiromantic-lines",
+      "name": "Chiromantic Lines",
+      "tags": [
+        "Invisibility"
+      ],
+      "snippets": {
+        "Invisibility": "…well as one's palm lines with an almost invisible series of tracings. Activate—Cunning…"
+      },
+      "matchMethod": {
+        "Invisibility": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.Rnn0Kk8apKXXxc5s": {
+      "slug": "dreamers-butterfly",
+      "name": "Dreamer's Butterfly",
+      "tags": [
+        "Illusion"
+      ],
+      "snippets": {
+        "Illusion": "…leep traits. Activate—Wake the Dream 1 (illusion, manipulate, mental) Effect By touching…"
+      },
+      "matchMethod": {
+        "Illusion": "regex"
+      }
+    },
+    "Compendium.pf2e.equipment-srd.Item.eshkhs9FdLQwuxgU": {
+      "slug": "golden-souled-yang-na",
+      "name": "Golden-Souled Yang Na",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
+    },
+    "Compendium.pf2e.equipment-srd.Item.YpxN7nChjTY706ha": {
+      "slug": "nine-void-sleeves",
+      "name": "Nine Void Sleeves",
+      "tags": [],
+      "snippets": {},
+      "matchMethod": {}
     }
   },
   "categories": [

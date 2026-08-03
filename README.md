@@ -49,10 +49,15 @@ Then:
 
 - **Filter by ability tag** — pick one or more tag chips in the sidebar (OR within
   the group). This is the headline feature.
-- **Refine** with the supporting filters: free-text name/description search, level
-  range, rarity, traits, price range (`AND` across categories, `OR` within a
-  multi-select). An `includePriceless` toggle brings priceless items back into a
-  numeric price range.
+- **Refine** with the supporting filters: free-text search, level range, rarity,
+  traits, price range (`AND` across categories, `OR` within a multi-select). An
+  `includePriceless` toggle brings priceless items back into a numeric price
+  range.
+- **Free-text search covers names *and* description bodies**, so you can find
+  "the item that grants fast healing" without knowing its name; name matches
+  still rank first. Description text is pulled from the compendium once, when
+  the window is first opened — it takes a few seconds, and until it lands the
+  box matches names only (results widen automatically when it does).
 - **Act on a result** — click to see the detail pane (matched tags + the snippets
   that earned them + enriched description); double-click / Enter / the open icon
   opens the item sheet; **drag** a result onto a sheet or the canvas to place it.

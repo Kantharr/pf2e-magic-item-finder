@@ -306,6 +306,71 @@ export async function fetchItemDescription(uuid: string): Promise<string | null>
   }
 }
 
+/**
+ * Flatten description HTML to searchable plain text: Foundry inline references
+ * (`@UUID[…]{Label}`, `@Damage[2d6]`, …) collapse to their visible label, tags
+ * are dropped, entities are decoded, and whitespace is collapsed. Cheap and
+ * dependency-free — the result is only ever fed to the text index, never shown.
+ */
+export function descriptionToText(html: string): string {
+  const withLabels = html
+    // `@Thing[args]{Label}` → `Label`; `@Thing[args]` → `args`.
+    .replace(/@\w+\[[^\]]*\]\{([^}]*)\}/g, "$1")
+    .replace(/@\w+\[([^\]]*)\]/g, "$1");
+  // Block-ish tags become a space so adjacent words don't fuse ("oneTwo").
+  const stripped = withLabels.replace(/<[^>]*>/g, " ");
+  const decoded = stripped
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  return decoded.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Bulk-load plain-text descriptions for every item in {@link index}, keyed by
+ * uuid — the payload {@link import("../search/query-engine.js").SearchEngine.setDescriptions}
+ * needs to make description search work.
+ *
+ * Loads the whole pack in one `getDocuments()` call rather than thousands of
+ * per-item `fromUuid` round trips (see {@link fetchItemDescription}, which stays
+ * the right tool for the single selected item). Only the flattened text is kept,
+ * so the documents themselves are free to be collected afterwards. Items with no
+ * description are simply absent from the result.
+ */
+export async function loadItemDescriptions(index: ItemIndex): Promise<Record<string, string>> {
+  const pack = game.packs?.get(EQUIPMENT_PACK_ID);
+  if (!pack) {
+    throw new Error(
+      `${MODULE_ID} | equipment pack "${EQUIPMENT_PACK_ID}" not found; is the PF2e system active?`,
+    );
+  }
+  const getDocuments = (pack as {
+    getDocuments: () => Promise<Iterable<{
+      uuid?: string;
+      id?: string;
+      system?: { description?: { value?: string } };
+    }>>;
+  }).getDocuments;
+  const docs = await getDocuments.call(pack);
+
+  const out: Record<string, string> = {};
+  for (const doc of docs) {
+    // Compose the uuid from the id if the document doesn't carry one, so the
+    // join matches the index's key exactly (same prefix the index builds with).
+    const uuid = doc.uuid ?? (doc.id ? PACK_UUID_PREFIX + doc.id : null);
+    // Only the magical items we actually index are worth carrying.
+    if (!uuid || !index.byUuid.has(uuid)) continue;
+    const raw = doc.system?.description?.value;
+    if (!raw) continue;
+    const text = descriptionToText(raw);
+    if (text) out[uuid] = text;
+  }
+  return out;
+}
+
 /** One-line console summary of a built index (size + tag-join hit rate). */
 export function logItemIndex(index: ItemIndex): void {
   const s = index.stats;

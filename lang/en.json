@@ -7,7 +7,9 @@
   "PF2E_MAGIC_ITEM_FINDER.Settings.DebugLogging.Hint": "Log extra diagnostics to the console (per-client).",
 
   "PF2E_MAGIC_ITEM_FINDER.Filter.Search": "Search",
-  "PF2E_MAGIC_ITEM_FINDER.Filter.SearchPlaceholder": "Search name & description…",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.SearchPlaceholder": "Search names and descriptions…",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.LoadingDescriptions": "Loading item descriptions…",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.DescriptionsFailed": "Could not load item descriptions; search will match item names only.",
   "PF2E_MAGIC_ITEM_FINDER.Filter.AbilityTags": "Ability tags",
   "PF2E_MAGIC_ITEM_FINDER.Filter.Rarity": "Rarity",
   "PF2E_MAGIC_ITEM_FINDER.Filter.Level": "Level",
