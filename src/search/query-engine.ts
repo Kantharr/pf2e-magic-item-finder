@@ -1,5 +1,5 @@
 import MiniSearch from "minisearch";
-import type { IndexedItem, ItemIndex } from "../data/item-index.js";
+import { WEAPON_HANDS_ORDER, type IndexedItem, type ItemIndex, type WeaponHands } from "../data/item-index.js";
 
 /**
  * Phase 4 — the pure, UI-agnostic search/filter engine over the Phase 3 item
@@ -27,6 +27,9 @@ export interface FilterState {
    * text to have been loaded into the engine
    * ({@link SearchEngine.setDescriptions}); until then this matches names only.
    * Blank = no text filter.
+   *
+   * A term prefixed with `-` is an **exclusion**: `staff -wand` finds staves that
+   * never mention a wand. See {@link parseQueryText} for the exact syntax.
    */
   text?: string;
   /** Selected ability-tag names (OR within). Empty = any tags. */
@@ -47,6 +50,13 @@ export interface FilterState {
    */
   weaponGroups?: readonly string[];
   armorCategories?: readonly string[];
+  /**
+   * Selected weapon hand counts ("1", "1+", "2"; OR within). Its own AND axis,
+   * *not* part of the weapon-group/armor OR axis: "two-handed swords" should
+   * mean both, not either. Only weapons carry a hand count, so any selection
+   * here narrows the result to weapons. Empty = no hands filter.
+   */
+  hands?: readonly string[];
   /** Inclusive gp-equivalent price bounds; null/undefined = unbounded. */
   minPriceGp?: number | null;
   maxPriceGp?: number | null;
@@ -100,6 +110,8 @@ export interface FilterOptionLists {
   weaponGroups: string[];
   /** Distinct armor categories present among armor, in size order (light→heavy). */
   armorCategories: string[];
+  /** Distinct weapon hand counts present, in canonical order (1 → 1+ → 2). */
+  hands: WeaponHands[];
   /** Distinct rarities present, in canonical order (common→uncommon→rare→unique). */
   rarities: string[];
   /** Observed level range across the corpus (for slider bounds). */
@@ -126,6 +138,14 @@ export interface SearchEngineOptions {
   descriptions?: Record<string, string>;
 }
 
+/**
+ * One shared collator for name ordering. `String.prototype.localeCompare` builds
+ * a collator per *call*, which dominates every large query — sorting the full
+ * ~3.9k-item corpus cost ~260ms that way versus ~10ms here. Same locale and
+ * sensitivity, so the ordering is unchanged.
+ */
+const NAME_COLLATOR = new Intl.Collator(undefined, { sensitivity: "base" });
+
 /** Canonical PF2e rarity order (rarest last). */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
 
@@ -138,6 +158,18 @@ interface TextDoc {
   name: string;
   description: string;
 }
+
+/**
+ * Documents per chunk when folding descriptions in asynchronously.
+ *
+ * `addAllAsync` yields to the event loop (a `setTimeout(0)`) between chunks, so
+ * this trades total wall-clock for responsiveness: the whole-corpus rebuild is
+ * ~460ms of work over ~3.9k items (~0.12ms each), and 100 keeps each chunk near
+ * a single 60fps frame instead of one ~460ms block that freezes typing. Do not
+ * use MiniSearch's default of 10 — that would be ~390 yields, and the timer
+ * clamp alone would cost more than the work.
+ */
+const TEXT_INDEX_CHUNK_SIZE = 100;
 
 /**
  * Build a search engine bound to one {@link ItemIndex}. Precomputes the option
@@ -159,12 +191,26 @@ export class SearchEngine {
    * via {@link setDescriptions}) — description-scoped queries are meaningless
    * before that. */
   private descriptionsLoaded: boolean;
+  /** The raw description text last handed to {@link buildTextIndex}, kept so the
+   * exclusion haystacks can be (re)built from it. */
+  private descriptions: Record<string, string>;
+  /**
+   * uuid → lower-cased "name + description", the substring haystack behind `-term`
+   * exclusions. Built on first use and dropped whenever the text index is rebuilt:
+   * it is a second full copy of the description text, so a session that never
+   * types a `-` never pays for it.
+   */
+  private haystacks: Map<string, string> | null = null;
+  /** Incremented per {@link setDescriptions} call so an in-flight chunked build
+   * that has been superseded discards its result instead of winning the swap. */
+  private buildToken = 0;
   /** Precomputed option lists for the UI. */
   readonly options: FilterOptionLists;
 
   constructor(index: ItemIndex, opts: SearchEngineOptions = {}) {
     this.index = index;
     const descriptions = opts.descriptions ?? {};
+    this.descriptions = descriptions;
     this.mini = buildTextIndex(index.items, descriptions);
     this.descriptionsLoaded = Object.keys(descriptions).length > 0;
     this.options = buildOptionLists(index, opts.categories);
@@ -179,11 +225,52 @@ export class SearchEngine {
    * Fold descriptions into the full-text index after construction — they are
    * fetched lazily in Foundry (large payloads), so the engine starts name-only
    * and is upgraded on demand when the user first asks to search descriptions.
-   * Rebuilds the MiniSearch index in place; queries afterwards see both fields.
+   *
+   * The rebuild is chunked (`addAllAsync`, {@link TEXT_INDEX_CHUNK_SIZE}) and
+   * lands in a **separate** index that replaces the live one only once it is
+   * complete. Two properties fall out of that, and both matter:
+   *
+   * - queries during the rebuild keep hitting the old name-only index and return
+   *   correct (if narrower) results, rather than seeing a half-populated one;
+   * - the yields between chunks keep typing responsive, at the cost of a slightly
+   *   longer total — the work stops being one ~460ms freeze.
+   *
+   * A later call supersedes an in-flight one, so an index rebuild racing a
+   * description load can't have the stale result win.
    */
-  setDescriptions(descriptions: Record<string, string>): void {
-    this.mini = buildTextIndex(this.index.items, descriptions);
+  async setDescriptions(descriptions: Record<string, string>): Promise<void> {
+    const token = ++this.buildToken;
+    const next = createTextIndex();
+    await next.addAllAsync(toTextDocs(this.index.items, descriptions), {
+      chunkSize: TEXT_INDEX_CHUNK_SIZE,
+    });
+    if (token !== this.buildToken) return; // superseded mid-build; discard.
+    // Swap atomically: everything derived from the text lands together.
+    this.descriptions = descriptions;
+    this.mini = next;
     this.descriptionsLoaded = Object.keys(descriptions).length > 0;
+    // Stale: rebuilt on the next query that actually needs it.
+    this.haystacks = null;
+  }
+
+  /**
+   * The lower-cased name+description haystack for each item, built once on
+   * demand. Until descriptions land this covers names only, so an exclusion
+   * narrows further (rather than widening, as the positive side does) once the
+   * bodies arrive — the app re-queries at that point either way.
+   */
+  private exclusionHaystacks(): Map<string, string> {
+    if (this.haystacks) return this.haystacks;
+    const map = new Map<string, string>();
+    for (const item of this.index.items) {
+      const description = this.descriptions[item.uuid];
+      map.set(
+        item.uuid,
+        description ? `${item.name}\n${description}`.toLowerCase() : item.name.toLowerCase(),
+      );
+    }
+    this.haystacks = map;
+    return map;
   }
 
   /**
@@ -192,15 +279,28 @@ export class SearchEngine {
    *    (OR within the selection); no tags selected → the full corpus;
    * 2. apply the structured predicates (level, rarity, traits, price) — AND
    *    across categories;
-   * 3. when text is present, AND-intersect with the MiniSearch candidate set;
-   * 4. sort (relevance when text is present and requested, else the chosen key).
+   * 3. drop anything matching a `-term` exclusion;
+   * 4. when positive text is present, AND-intersect with the MiniSearch
+   *    candidate set;
+   * 5. sort (relevance when text is present and requested, else the chosen key).
    */
   query(state: FilterState, queryOptions: QueryOptions = {}): QueryResult {
     // 1 + 2: structured candidate set (Map preserves the index's item order).
     const structured = this.structuredMatches(state);
 
-    // 3: intersect with the free-text candidate set, keeping relevance rank.
-    const text = normalizeText(state.text);
+    const { include: text, exclude } = parseQueryText(state.text);
+
+    // 3: remove excluded items before the text pass, so an exclusion applies
+    // just as well to a query that has no positive terms at all ("-staff").
+    if (exclude.length > 0) {
+      const haystacks = this.exclusionHaystacks();
+      for (const uuid of structured.keys()) {
+        const haystack = haystacks.get(uuid) ?? "";
+        if (exclude.some((term) => haystack.includes(term))) structured.delete(uuid);
+      }
+    }
+
+    // 4: intersect with the free-text candidate set, keeping relevance rank.
     let rows: IndexedItem[];
     let rank: Map<string, number> | null = null;
     if (text) {
@@ -219,7 +319,7 @@ export class SearchEngine {
       rows = [...structured.values()];
     }
 
-    // 4: order the surviving rows.
+    // 5: order the surviving rows.
     const sorted = this.sortRows(rows, state, rank);
 
     const total = sorted.length;
@@ -296,11 +396,44 @@ export class SearchEngine {
   }
 }
 
-/** Trim + collapse a free-text query; empty/whitespace → null (no text filter). */
-function normalizeText(text: string | undefined): string | null {
-  if (!text) return null;
-  const trimmed = text.trim();
-  return trimmed.length > 0 ? trimmed : null;
+/** A free-text query split into its positive and negative halves. */
+export interface ParsedQuery {
+  /** The positive terms, re-joined for MiniSearch; null when there are none. */
+  include: string | null;
+  /** Lower-cased exclusion terms (the `-` already stripped). */
+  exclude: string[];
+}
+
+/**
+ * Split a raw search string into terms to match and terms to exclude.
+ *
+ * A token beginning with `-` is an exclusion — `staff -wand` means "matches
+ * staff, does not mention wand", and a query of *only* exclusions (`-staff`)
+ * filters the whole corpus rather than searching it. The `-` only counts at the
+ * start of a token, so hyphenated words ("fatal-aim", "well-known") and a bare
+ * dash are left alone.
+ *
+ * Exclusions are matched as plain case-insensitive **substrings** of the name
+ * and description, not as MiniSearch terms: prefix/fuzzy matching is right for
+ * finding things and wrong for hiding them (fuzzy "staff" would also drop
+ * "stuff"), and substring semantics are what "has staff in the name" means —
+ * `-staff` hides "Quarterstaff" too.
+ */
+export function parseQueryText(text: string | undefined): ParsedQuery {
+  if (!text) return { include: null, exclude: [] };
+  const include: string[] = [];
+  const exclude: string[] = [];
+  for (const token of text.trim().split(/\s+/)) {
+    if (token.length === 0) continue;
+    if (token.startsWith("-")) {
+      const term = token.slice(1);
+      // A lone "-" excludes nothing; drop it rather than excluding everything.
+      if (term.length > 0) exclude.push(term.toLowerCase());
+    } else {
+      include.push(token);
+    }
+  }
+  return { include: include.length > 0 ? include.join(" ") : null, exclude };
 }
 
 /** Predicate for the structured (non-tag, non-text) filters. */
@@ -326,6 +459,11 @@ function matchesStructured(item: IndexedItem, state: FilterState): boolean {
     const matchesArmor =
       item.type === "armor" && item.category != null && armorCategories.includes(item.category);
     if (!matchesWeapon && !matchesArmor) return false;
+  }
+
+  if (state.hands && state.hands.length > 0) {
+    // Non-weapons have no hand count, so they drop out here by construction.
+    if (item.hands == null || !state.hands.includes(item.hands)) return false;
   }
 
   const hasPriceBound = state.minPriceGp != null || state.maxPriceGp != null;
@@ -358,16 +496,13 @@ function comparatorFor(field: "name" | "level" | "price"): (a: IndexedItem, b: I
       };
     case "name":
     default:
-      return (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      return (a, b) => NAME_COLLATOR.compare(a.name, b.name);
   }
 }
 
-/** Construct the MiniSearch index over name + (optional) description text. */
-function buildTextIndex(
-  items: readonly IndexedItem[],
-  descriptions: Record<string, string>,
-): MiniSearch<TextDoc> {
-  const mini = new MiniSearch<TextDoc>({
+/** An empty MiniSearch index configured for the corpus. */
+function createTextIndex(): MiniSearch<TextDoc> {
+  return new MiniSearch<TextDoc>({
     idField: "id",
     fields: ["name", "description"],
     // Weight name hits far above description body (BM25 column
@@ -379,12 +514,27 @@ function buildTextIndex(
       combineWith: "AND",
     },
   });
-  const docs: TextDoc[] = items.map((item) => ({
+}
+
+/** Project the items into MiniSearch documents. */
+function toTextDocs(
+  items: readonly IndexedItem[],
+  descriptions: Record<string, string>,
+): TextDoc[] {
+  return items.map((item) => ({
     id: item.uuid,
     name: item.name,
     description: descriptions[item.uuid] ?? "",
   }));
-  mini.addAll(docs);
+}
+
+/** Construct the MiniSearch index over name + (optional) description text. */
+function buildTextIndex(
+  items: readonly IndexedItem[],
+  descriptions: Record<string, string>,
+): MiniSearch<TextDoc> {
+  const mini = createTextIndex();
+  mini.addAll(toTextDocs(items, descriptions));
   return mini;
 }
 
@@ -409,10 +559,13 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
   // light→heavy order; anything unexpected trails alphabetically.
   const weaponGroupSet = new Set<string>();
   const armorCategorySet = new Set<string>();
+  const handsSet = new Set<WeaponHands>();
   for (const item of index.items) {
     if (item.type === "weapon" && item.group) weaponGroupSet.add(item.group);
     if (item.type === "armor" && item.category) armorCategorySet.add(item.category);
+    if (item.hands) handsSet.add(item.hands);
   }
+  const hands = WEAPON_HANDS_ORDER.filter((h) => handsSet.has(h));
   const weaponGroups = [...weaponGroupSet].sort((a, b) => a.localeCompare(b));
   const armorCategories: string[] = [];
   for (const c of ARMOR_CATEGORY_ORDER) if (armorCategorySet.delete(c)) armorCategories.push(c);
@@ -445,5 +598,5 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
     : { min: 0, max: 0 };
   const priceRange = anyPriced ? { min: minPrice, max: maxPrice } : null;
 
-  return { tags, traits, weaponGroups, armorCategories, rarities, levelRange, priceRange };
+  return { tags, traits, weaponGroups, armorCategories, hands, rarities, levelRange, priceRange };
 }

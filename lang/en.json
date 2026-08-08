@@ -8,6 +8,7 @@
 
   "PF2E_MAGIC_ITEM_FINDER.Filter.Search": "Search",
   "PF2E_MAGIC_ITEM_FINDER.Filter.SearchPlaceholder": "Search names and descriptions…",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.SearchHint": "Prefix a word with - to exclude it, e.g. flight -staff.",
   "PF2E_MAGIC_ITEM_FINDER.Filter.LoadingDescriptions": "Loading item descriptions…",
   "PF2E_MAGIC_ITEM_FINDER.Filter.DescriptionsFailed": "Could not load item descriptions; search will match item names only.",
   "PF2E_MAGIC_ITEM_FINDER.Filter.AbilityTags": "Ability tags",
@@ -19,6 +20,11 @@
   "PF2E_MAGIC_ITEM_FINDER.Filter.TraitsHint": "Click to toggle; scroll for more.",
   "PF2E_MAGIC_ITEM_FINDER.Filter.WeaponGroup": "Weapon group",
   "PF2E_MAGIC_ITEM_FINDER.Filter.ArmorCategory": "Armor",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.Hands": "Weapon hands",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1": "1 hand",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1Plus": "1+ hands",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.Hands2": "2 hands",
+  "PF2E_MAGIC_ITEM_FINDER.Filter.HandsHint": "Weapons only; 1+ needs a second hand free to use.",
   "PF2E_MAGIC_ITEM_FINDER.Filter.Clear": "Clear filters",
 
   "PF2E_MAGIC_ITEM_FINDER.Results.Name": "Name",

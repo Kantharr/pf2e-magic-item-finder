@@ -14,6 +14,7 @@ import {
   savePreset,
 } from "../data/presets.js";
 import { buildExportRows, downloadCsv, downloadJson } from "../data/export.js";
+import { parseQueryText } from "../search/query-engine.js";
 import type {
   FilterState,
   FilterOptionLists,
@@ -38,6 +39,19 @@ const SEARCH_DEBOUNCE_MS = 250;
 
 /** Canonical PF2e rarity order for the rarity chip row. */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
+
+/** Hand-count value → its localization key + English fallback label. */
+const HANDS_LABELS: Record<string, { key: string; fallback: string }> = {
+  "1": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1", fallback: "1 hand" },
+  "1+": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1Plus", fallback: "1+ hands" },
+  "2": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands2", fallback: "2 hands" },
+};
+
+/** Display label for a weapon hand count, falling back to the raw value. */
+function handsLabel(value: string): string {
+  const entry = HANDS_LABELS[value];
+  return entry ? t(entry.key, entry.fallback) : value;
+}
 
 /** Resolve the module's live search engine, or null before the index is built. */
 function currentEngine(): SearchEngine | null {
@@ -223,6 +237,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       toggleTrait: MagicItemFinderApp.#onToggleTrait,
       toggleWeaponGroup: MagicItemFinderApp.#onToggleWeaponGroup,
       toggleArmorCategory: MagicItemFinderApp.#onToggleArmorCategory,
+      toggleHands: MagicItemFinderApp.#onToggleHands,
       sortColumn: MagicItemFinderApp.#onSortColumn,
       clearFilters: MagicItemFinderApp.#onClearFilters,
       selectItem: MagicItemFinderApp.#onSelectItem,
@@ -347,6 +362,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     const selTraits = new Set(this.#filter.traits ?? []);
     const selWeaponGroups = new Set(this.#filter.weaponGroups ?? []);
     const selArmorCategories = new Set(this.#filter.armorCategories ?? []);
+    const selHands = new Set(this.#filter.hands ?? []);
     const presets = listPresets();
     const hasActive = this.#activePreset != null && presets.some((p) => p.name === this.#activePreset);
     return {
@@ -372,6 +388,12 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
         active: selArmorCategories.has(c),
       })),
       hasArmorCategories: options.armorCategories.length > 0,
+      hands: options.hands.map((h) => ({
+        value: h,
+        label: handsLabel(h),
+        active: selHands.has(h),
+      })),
+      hasHands: options.hands.length > 0,
       levelRange: options.levelRange,
       priceRange: options.priceRange,
       minLevel: this.#filter.minLevel ?? "",
@@ -400,10 +422,17 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     };
   }
 
-  /** Per-column sort state for the clickable result headers. The effective field
-   * mirrors the engine's default (relevance while searching, else name). */
+  /** The sort field in effect, mirroring the engine's own default: relevance
+   * only when there is positive text to rank against — an exclusion-only query
+   * like "-staff" produces no ranking, so it falls back to name. */
+  #effectiveSort(): SortField {
+    if (this.#filter.sort) return this.#filter.sort;
+    return parseQueryText(this.#filter.text).include ? "relevance" : "name";
+  }
+
+  /** Per-column sort state for the clickable result headers. */
   #sortHeaders(): { name: SortHeaderVM; level: SortHeaderVM; price: SortHeaderVM } {
-    const active: SortField = this.#filter.sort ?? (this.#filter.text ? "relevance" : "name");
+    const active: SortField = this.#effectiveSort();
     const dir = this.#filter.sortDir ?? "asc";
     const header = (field: SortField): SortHeaderVM => ({
       active: field === active,
@@ -441,6 +470,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     const metaParts = [`Level ${item.level}`, titleCase(item.rarity)];
     const price = formatPrice(item.priceGp);
     if (price !== "—") metaParts.push(price);
+    if (item.hands) metaParts.push(handsLabel(item.hands));
 
     return {
       uuid: item.uuid,
@@ -517,7 +547,20 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     const index = currentIndex();
     if (!engine || !index) return false;
     try {
-      engine.setDescriptions(await loadItemDescriptions(index));
+      // Timed in two halves: the pack read (the part that used to instantiate
+      // every Item document) and the text-index rebuild, so a slow load can be
+      // attributed from the console without a profiler.
+      const started = performance.now();
+      const descriptions = await loadItemDescriptions(index);
+      const readMs = performance.now() - started;
+      const indexStarted = performance.now();
+      await engine.setDescriptions(descriptions);
+      const indexMs = performance.now() - indexStarted;
+      console.log(
+        `${MODULE_ID} | descriptions loaded: ${Object.keys(descriptions).length} items in ` +
+          `${Math.round(readMs + indexMs)}ms (pack read ${Math.round(readMs)}ms, ` +
+          `text index ${Math.round(indexMs)}ms)`,
+      );
       return true;
     } catch (err) {
       console.error(`${MODULE_ID} | failed to load item descriptions`, err);
@@ -832,10 +875,22 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   /** Click a results column header: sort by it (asc), or flip direction if it is
    * already the active sort field. */
+  static #onToggleHands(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+    const hands = target.dataset.hands;
+    if (!hands) return;
+    const set = new Set(this.#filter.hands ?? []);
+    if (set.has(hands)) set.delete(hands);
+    else set.add(hands);
+    this.#filter.hands = set.size ? [...set] : undefined;
+    target.classList.toggle("active", set.has(hands));
+    target.setAttribute("aria-pressed", String(set.has(hands)));
+    this.#markDirtyAndRenderResults();
+  }
+
   static #onSortColumn(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
     const field = target.dataset.sort as SortField | undefined;
     if (field !== "name" && field !== "level" && field !== "price") return;
-    const active: SortField = this.#filter.sort ?? (this.#filter.text ? "relevance" : "name");
+    const active: SortField = this.#effectiveSort();
     if (field === active) {
       this.#filter.sortDir = (this.#filter.sortDir ?? "asc") === "asc" ? "desc" : "asc";
     } else {

@@ -36,6 +36,64 @@ export function hasMagicalMarker(traits: readonly string[] | undefined): boolean
   return false;
 }
 
+/**
+ * `system.runes` on a weapon, armor, or shield. Every field is optional: the
+ * fundamental runes are numeric grades (0 = absent) and `property` lists the
+ * property-rune slugs.
+ */
+export interface RawRunes {
+  potency?: number | null;
+  striking?: number | null;
+  resilient?: number | null;
+  reinforcing?: number | null;
+  /** Property-rune slugs. Normally an array, but a handful of pack entries carry
+   * the object-shaped remnant `{"0": ""}`, so both forms are tolerated. */
+  property?: readonly string[] | Record<string, string> | null;
+}
+
+/**
+ * True when an item carries at least one etched rune (fundamental or property).
+ * Runes are magic by definition, and the remaster's **specific magic items** —
+ * "Iris of the Sky", "Robe of the Archmagi", … — are the reason this matters:
+ * they are stamped with runes but *no* trait from {@link MAGICAL_MARKER_TRAITS},
+ * so a trait-only predicate silently drops ~116 of the pack's magic items.
+ */
+export function hasMagicalRunes(runes: RawRunes | null | undefined): boolean {
+  if (!runes) return false;
+  if ((runes.potency ?? 0) > 0) return true;
+  if ((runes.striking ?? 0) > 0) return true;
+  if ((runes.resilient ?? 0) > 0) return true;
+  if ((runes.reinforcing ?? 0) > 0) return true;
+  const property = runes.property;
+  const slugs = Array.isArray(property)
+    ? property
+    : property && typeof property === "object"
+      ? Object.values(property)
+      : [];
+  return slugs.some((slug) => typeof slug === "string" && slug.length > 0);
+}
+
+/**
+ * The `pack.getIndex()` field paths backing {@link hasMagicalRunes}. Requested
+ * as leaves rather than the whole `system.runes` object because the server
+ * projects the index one requested path at a time.
+ */
+export const RUNE_INDEX_FIELDS: readonly string[] = [
+  "system.runes.potency",
+  "system.runes.striking",
+  "system.runes.resilient",
+  "system.runes.reinforcing",
+  "system.runes.property",
+];
+
+/** The corpus predicate: a marker trait **or** an etched rune. */
+export function isMagicalItem(item: {
+  traits?: readonly string[];
+  runes?: RawRunes | null;
+}): boolean {
+  return hasMagicalMarker(item.traits) || hasMagicalRunes(item.runes);
+}
+
 /** How a map entry was resolved against the live pack (or that it wasn't). */
 export interface CoverageReport {
   /** Entries in the bundled map. */
@@ -100,13 +158,13 @@ async function readLiveMagicalItems(pack: unknown): Promise<LiveItem[]> {
     getIndex: (options?: { fields?: string[] }) => Promise<Iterable<RawIndexEntry>>;
   }).getIndex;
   const index = await getIndex.call(pack, {
-    fields: ["system.slug", "system.traits.value"],
+    fields: ["system.slug", "system.traits.value", ...RUNE_INDEX_FIELDS],
   });
 
   const items: LiveItem[] = [];
   for (const entry of index) {
     const traits = entry.system?.traits?.value ?? [];
-    if (!hasMagicalMarker(traits)) continue;
+    if (!isMagicalItem({ traits, runes: entry.system?.runes })) continue;
     const name = entry.name ?? "(unnamed)";
     const indexSlug = entry.system?.slug ?? null;
     items.push({
@@ -124,7 +182,11 @@ async function readLiveMagicalItems(pack: unknown): Promise<LiveItem[]> {
 interface RawIndexEntry {
   _id: string;
   name?: string;
-  system?: { slug?: string | null; traits?: { value?: string[] } };
+  system?: {
+    slug?: string | null;
+    traits?: { value?: string[] };
+    runes?: RawRunes | null;
+  };
 }
 
 /** Pure counting core (separated so it is unit-testable without a live pack). */

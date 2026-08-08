@@ -81,6 +81,7 @@ function sanitizeState(state: FilterState): FilterState {
   if (state.traits?.length) out.traits = [...state.traits];
   if (state.weaponGroups?.length) out.weaponGroups = [...state.weaponGroups];
   if (state.armorCategories?.length) out.armorCategories = [...state.armorCategories];
+  if (state.hands?.length) out.hands = [...state.hands];
   if (state.tags?.length) out.tags = [...state.tags];
   if (state.sort) out.sort = state.sort;
   if (state.sortDir) out.sortDir = state.sortDir;
@@ -155,6 +156,7 @@ export function coerceAppliedState(
   const traitSet = new Set(options.traits);
   const weaponGroupSet = new Set(options.weaponGroups);
   const armorCategorySet = new Set(options.armorCategories);
+  const handsSet = new Set<string>(options.hands);
   const raritySet = new Set(options.rarities);
 
   const keep = (values: readonly string[] | undefined, allowed: Set<string>): string[] | undefined => {
@@ -177,6 +179,7 @@ export function coerceAppliedState(
     traits: keep(state.traits, traitSet),
     weaponGroups: keep(state.weaponGroups, weaponGroupSet),
     armorCategories: keep(state.armorCategories, armorCategorySet),
+    hands: keep(state.hands, handsSet),
     tags: keep(state.tags, tagNames),
     sort: state.sort && sortFields.includes(state.sort) ? state.sort : undefined,
     sortDir: state.sortDir && sortDirs.includes(state.sortDir) ? state.sortDir : undefined,

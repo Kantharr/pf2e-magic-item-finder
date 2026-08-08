@@ -6,6 +6,7 @@
            placeholder="{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.SearchPlaceholder"}}"
            aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Search"}}" />
   </div>
+  <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.SearchHint"}}</p>
   {{!-- Ability-tag chips: the headline filter, first + most prominent.
         Bounded, scrollable box (like the traits list) so a long dictionary
         doesn't push the rest of the sidebar off-screen. --}}
@@ -92,6 +93,21 @@
       </button>
       {{/each}}
     </div>
+  </section>
+  {{/if}}
+
+  {{#if sidebar.hasHands}}
+  <section class="pf2e-mif-filter">
+    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Hands"}}</h3>
+    <div class="pf2e-mif-chips">
+      {{#each sidebar.hands}}
+      <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
+              data-action="toggleHands" data-hands="{{value}}" aria-pressed="{{active}}">
+        {{label}}
+      </button>
+      {{/each}}
+    </div>
+    <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.HandsHint"}}</p>
   </section>
   {{/if}}
 

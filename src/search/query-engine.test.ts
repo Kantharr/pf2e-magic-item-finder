@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import type { IndexedItem, ItemIndex } from "../data/item-index.js";
-import { createSearchEngine, type FilterState } from "./query-engine.js";
+import type { IndexedItem, ItemIndex, WeaponHands } from "../data/item-index.js";
+import { createSearchEngine, parseQueryText, type FilterState } from "./query-engine.js";
 
 /**
  * Phase 4 verification. A small, hand-built fixture with known
@@ -24,6 +24,8 @@ interface ItemSpec {
   category?: string | null;
   /** system.group (weapon group, e.g. firearm/sword; armor group). */
   group?: string | null;
+  /** Hands the weapon occupies ("1" / "1+" / "2"); non-weapons leave this null. */
+  hands?: WeaponHands | null;
 }
 
 /** Build a full {@link IndexedItem} from a terse spec (uuid derived from name). */
@@ -43,6 +45,7 @@ function makeItem(spec: ItemSpec): IndexedItem {
     type: spec.type ?? "equipment",
     category: spec.category ?? null,
     group: spec.group ?? null,
+    hands: spec.hands ?? null,
     tags: spec.tags,
     snippets: {},
     matchMethod: {},
@@ -287,7 +290,7 @@ describe("search spans names and descriptions", () => {
     expect(names({ text: "cursed", rarities: ["rare"] })).toEqual(["Dagger of Doom"]);
   });
 
-  it("matches names only until setDescriptions supplies the body text", () => {
+  it("matches names only until setDescriptions supplies the body text", async () => {
     const index = makeIndex(SPECS);
     const engine = createSearchEngine(index, { categories: CATEGORIES });
     expect(engine.hasDescriptions).toBe(false);
@@ -302,7 +305,7 @@ describe("search spans names and descriptions", () => {
       const spec = SPECS.find((s) => s.name === item.name);
       if (spec?.description) descriptions[item.uuid] = spec.description;
     }
-    engine.setDescriptions(descriptions);
+    await engine.setDescriptions(descriptions);
 
     // Once loaded, the same query widens to the body matches — and the name
     // match still works.
@@ -311,6 +314,189 @@ describe("search spans names and descriptions", () => {
       engine.query({ text: "cursed" }).items.map((i) => i.name).sort(),
     ).toEqual(["Amulet of Fire", "Dagger of Doom"]);
     expect(engine.query({ text: "boots" }).items.map((i) => i.name)).toEqual(["Boots of Speed"]);
+  });
+});
+
+describe("exclusion terms (-word)", () => {
+  it("splits a raw query into positive and negative halves", () => {
+    expect(parseQueryText("flight -staff")).toEqual({ include: "flight", exclude: ["staff"] });
+    expect(parseQueryText("-staff")).toEqual({ include: null, exclude: ["staff"] });
+    expect(parseQueryText("  fire   -wand  -staff ")).toEqual({
+      include: "fire",
+      exclude: ["wand", "staff"],
+    });
+    expect(parseQueryText("fire")).toEqual({ include: "fire", exclude: [] });
+    expect(parseQueryText(undefined)).toEqual({ include: null, exclude: [] });
+    expect(parseQueryText("   ")).toEqual({ include: null, exclude: [] });
+  });
+
+  it("lower-cases exclusions but leaves positive terms alone", () => {
+    expect(parseQueryText("Fire -STAFF")).toEqual({ include: "Fire", exclude: ["staff"] });
+  });
+
+  it("only treats a leading dash as an exclusion", () => {
+    // Hyphenated words are ordinary terms, and a bare dash excludes nothing
+    // (rather than excluding the empty string, which would match everything).
+    expect(parseQueryText("fatal-aim")).toEqual({ include: "fatal-aim", exclude: [] });
+    expect(parseQueryText("fire - wand")).toEqual({ include: "fire wand", exclude: [] });
+    expect(parseQueryText("-")).toEqual({ include: null, exclude: [] });
+  });
+
+  it("filters the whole corpus when the query is only exclusions", () => {
+    // No positive term: everything survives except the cursed items.
+    expect(names({ text: "-cursed" }).sort()).toEqual([
+      "Boots of Speed",
+      "Cloak of Elvenkind",
+      "Everlasting Rations",
+      "Flaming Sphere Wand",
+    ]);
+  });
+
+  it("subtracts from a positive match", () => {
+    expect(names({ text: "cursed" }).sort()).toEqual(["Amulet of Fire", "Dagger of Doom"]);
+    expect(names({ text: "cursed -amulet" })).toEqual(["Dagger of Doom"]);
+  });
+
+  it("excludes on the description body, not just the name", () => {
+    // "flame" appears only in Flaming Sphere Wand's description.
+    expect(names({ text: "-flame" })).not.toContain("Flaming Sphere Wand");
+    expect(names({ text: "-flame" })).toContain("Amulet of Fire");
+  });
+
+  it("applies every exclusion (AND, not OR)", () => {
+    const kept = names({ text: "-cursed -speed" }).sort();
+    expect(kept).toEqual(["Cloak of Elvenkind", "Everlasting Rations", "Flaming Sphere Wand"]);
+  });
+
+  it("matches substrings, so -flam also hides Flaming Sphere Wand", () => {
+    // Exclusion is literal substring, not MiniSearch prefix/fuzzy — a partial
+    // word hides anything containing it.
+    expect(names({ text: "-flam" })).not.toContain("Flaming Sphere Wand");
+    // …and fuzzy near-misses are NOT excluded ("doom" must not drop "Boots").
+    expect(names({ text: "-doom" })).toContain("Boots of Speed");
+  });
+
+  it("AND-intersects with the structured filters", () => {
+    expect(names({ text: "-cursed", rarities: ["common"] }).sort()).toEqual([
+      "Everlasting Rations",
+      "Flaming Sphere Wand",
+    ]);
+  });
+
+  it("excludes on names before descriptions are loaded", () => {
+    const engine = createSearchEngine(makeIndex(SPECS), { categories: CATEGORIES });
+    // Name-only haystack: the name match is excluded…
+    expect(engine.query({ text: "-amulet" }).items.map((i) => i.name)).not.toContain(
+      "Amulet of Fire",
+    );
+    // …but a body-only term can't hide anything yet.
+    expect(engine.query({ text: "-cursed" }).total).toBe(SPECS.length);
+  });
+
+  it("rebuilds the haystack when descriptions arrive", async () => {
+    const index = makeIndex(SPECS);
+    const engine = createSearchEngine(index, { categories: CATEGORIES });
+    // Build the name-only haystack first, so the rebuild is what's under test.
+    expect(engine.query({ text: "-cursed" }).total).toBe(SPECS.length);
+
+    const descriptions: Record<string, string> = {};
+    for (const item of index.items) {
+      const spec = SPECS.find((s) => s.name === item.name);
+      if (spec?.description) descriptions[item.uuid] = spec.description;
+    }
+    await engine.setDescriptions(descriptions);
+
+    expect(engine.query({ text: "-cursed" }).items.map((i) => i.name).sort()).toEqual([
+      "Boots of Speed",
+      "Cloak of Elvenkind",
+      "Everlasting Rations",
+      "Flaming Sphere Wand",
+    ]);
+  });
+});
+
+describe("chunked description rebuild", () => {
+  /** The description map the fixture's engine is upgraded with. */
+  function descriptionsFor(index: ItemIndex): Record<string, string> {
+    const out: Record<string, string> = {};
+    for (const item of index.items) {
+      const spec = SPECS.find((s) => s.name === item.name);
+      if (spec?.description) out[item.uuid] = spec.description;
+    }
+    return out;
+  }
+
+  it("never exposes a half-built index while the rebuild is in flight", async () => {
+    const index = makeIndex(SPECS);
+    const engine = createSearchEngine(index, { categories: CATEGORIES });
+
+    // Start the rebuild but do NOT await it, then query on the very next tick —
+    // the chunked build yields, so this lands mid-build.
+    const pending = engine.setDescriptions(descriptionsFor(index));
+
+    // The old name-only index is still the live one: a body-only term finds
+    // nothing (narrower), and a name term still works (correct).
+    expect(engine.hasDescriptions).toBe(false);
+    expect(engine.query({ text: "cursed" }).total).toBe(0);
+    expect(engine.query({ text: "boots" }).items.map((i) => i.name)).toEqual(["Boots of Speed"]);
+
+    await pending;
+
+    // Only after it resolves does the corpus widen.
+    expect(engine.hasDescriptions).toBe(true);
+    expect(engine.query({ text: "cursed" }).items.map((i) => i.name).sort()).toEqual([
+      "Amulet of Fire",
+      "Dagger of Doom",
+    ]);
+  });
+
+  it("indexes every document across chunk boundaries", async () => {
+    // The main fixture is smaller than one chunk, so nothing here would catch a
+    // document dropped at a seam. 250 items spans several chunks.
+    const many: ItemSpec[] = Array.from({ length: 250 }, (_, i) => ({
+      name: `Widget ${i}`,
+      level: 1,
+      rarity: "common",
+      traits: ["magical"],
+      priceGp: 10,
+      tags: [],
+      description: `body marker unique${i} filler text`,
+    }));
+    const index = makeIndex(many);
+    const engine = createSearchEngine(index, { categories: CATEGORIES });
+    const descriptions: Record<string, string> = {};
+    for (const item of index.items) {
+      descriptions[item.uuid] = many.find((s) => s.name === item.name)!.description!;
+    }
+
+    await engine.setDescriptions(descriptions);
+
+    // A term every body shares: 250 hits means no document was dropped.
+    expect(engine.query({ text: "marker" }).total).toBe(250);
+    // And each item on either side of a seam is individually findable. Uses
+    // toContain, not toEqual — the engine's fuzzy matching also surfaces
+    // near-identical neighbours like "unique3" for "unique0", which is correct
+    // behaviour here and not what this test is about.
+    for (const i of [0, 99, 100, 101, 199, 200, 249]) {
+      expect(engine.query({ text: `unique${i}` }).items.map((x) => x.name)).toContain(
+        `Widget ${i}`,
+      );
+    }
+  });
+
+  it("lets a later rebuild supersede an in-flight one", async () => {
+    const index = makeIndex(SPECS);
+    const engine = createSearchEngine(index, { categories: CATEGORIES });
+    const full = descriptionsFor(index);
+
+    // Kick off a build with the real bodies, then immediately supersede it with
+    // an empty one. The stale build must not win the swap when it finishes.
+    const stale = engine.setDescriptions(full);
+    const winner = engine.setDescriptions({});
+    await Promise.all([stale, winner]);
+
+    expect(engine.hasDescriptions).toBe(false);
+    expect(engine.query({ text: "cursed" }).total).toBe(0);
   });
 });
 
@@ -468,5 +654,51 @@ describe("weapon group / armor category filter", () => {
       .query({ weaponGroups: ["firearm"], rarities: ["unique"] })
       .items.map((i) => i.name);
     expect(names).toEqual(["Coldstar Pistols"]);
+  });
+});
+
+describe("weapon hands filter", () => {
+  const HANDED: ItemSpec[] = [
+    { name: "Flaming Longsword", level: 8, rarity: "common", traits: ["magical"], priceGp: 200, tags: [], type: "weapon", category: "martial", group: "sword", hands: "1" },
+    { name: "Iris of the Sky", level: 6, rarity: "unique", traits: [], priceGp: 240, tags: [], type: "weapon", category: "martial", group: "firearm", hands: "1" },
+    { name: "Godsbreath Bow", level: 11, rarity: "rare", traits: [], priceGp: 1300, tags: [], type: "weapon", category: "martial", group: "bow", hands: "1+" },
+    { name: "Worldringer", level: 4, rarity: "uncommon", traits: [], priceGp: 100, tags: [], type: "weapon", category: "martial", group: "hammer", hands: "2" },
+    // A weapon with no usable hand count (handwraps are worn, not held).
+    { name: "Handwraps of Mighty Blows", level: 2, rarity: "common", traits: ["magical"], priceGp: 35, tags: [], type: "weapon", category: "unarmed", group: "brawling", hands: null },
+    { name: "Ring of Wizardry", level: 6, rarity: "uncommon", traits: ["arcane"], priceGp: 360, tags: [], type: "equipment" },
+  ];
+  const engine = createSearchEngine(makeIndex(HANDED));
+
+  it("derives the hand counts present, in canonical order", () => {
+    expect(engine.options.hands).toEqual(["1", "1+", "2"]);
+  });
+
+  it("filters by a single hand count", () => {
+    const names = engine.query({ hands: ["2"] }).items.map((i) => i.name);
+    expect(names).toEqual(["Worldringer"]);
+  });
+
+  it("ORs within the selection", () => {
+    const names = engine.query({ hands: ["1", "1+"] }).items.map((i) => i.name);
+    expect(names.sort()).toEqual(["Flaming Longsword", "Godsbreath Bow", "Iris of the Sky"]);
+  });
+
+  it("drops items with no hand count (non-weapons and worn weapons)", () => {
+    const names = engine.query({ hands: ["1", "1+", "2"] }).items.map((i) => i.name);
+    expect(names).not.toContain("Ring of Wizardry");
+    expect(names).not.toContain("Handwraps of Mighty Blows");
+  });
+
+  it("ANDs with the weapon-group axis rather than ORing into it", () => {
+    // One-handed AND a firearm — not "one-handed or a firearm".
+    const names = engine
+      .query({ hands: ["1"], weaponGroups: ["firearm"] })
+      .items.map((i) => i.name);
+    expect(names).toEqual(["Iris of the Sky"]);
+  });
+
+  it("matches everything when nothing is selected", () => {
+    expect(engine.query({ hands: [] }).total).toBe(HANDED.length);
+    expect(engine.query({}).total).toBe(HANDED.length);
   });
 });

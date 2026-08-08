@@ -6,14 +6,18 @@ full-text description search, level/rarity/trait/price filters, saved presets, a
 CSV/JSON export.
 
 It reads the **live** `pf2e.equipment-srd` compendium for item data and joins it to
-a **bundled, pre-computed ability-tag map**. The result is the one thing the PF2e
+a **bundled, pre-computed ability-tag map**. An item counts as magical if it carries
+a marker trait (`magical`, `arcane`, `divine`, `occult`, `primal`, `artifact`) **or**
+any etched rune — the remaster strips the `magical` trait from *specific* magic
+items like *Iris of the Sky*, which are recognizable only by their runes. The
+result is the one thing the PF2e
 system's native Compendium Browser can't do: *"show me every item that lets a
 character fly / heal an ally / teleport."*
 
 ## Requirements
 
-- FoundryVTT **v12+** (verified on v12)
-- Pathfinder Second Edition system **v6.0.0+** (verified on v6.9.0)
+- FoundryVTT **v12+** (verified on v14)
+- Pathfinder Second Edition system **v6.0.0+** (verified on v8.4.0)
 
 No installer, runtime, or bundled database to manage — Foundry supplies the parsed
 item data and one-click, auto-updating installs.
@@ -50,14 +54,24 @@ Then:
 - **Filter by ability tag** — pick one or more tag chips in the sidebar (OR within
   the group). This is the headline feature.
 - **Refine** with the supporting filters: free-text search, level range, rarity,
-  traits, price range (`AND` across categories, `OR` within a multi-select). An
+  traits, price range, weapon group / armor category, and weapon hands — 1, 1+,
+  or 2 (`AND` across categories, `OR` within a multi-select). An
   `includePriceless` toggle brings priceless items back into a numeric price
-  range.
+  range. Weapon group and armor category share one "item type" axis (picking
+  *firearm* + *light* shows both); hands is its own axis, so *2 hands* + *sword*
+  means two-handed swords.
 - **Free-text search covers names *and* description bodies**, so you can find
   "the item that grants fast healing" without knowing its name; name matches
   still rank first. Description text is pulled from the compendium once, when
   the window is first opened — it takes a few seconds, and until it lands the
   box matches names only (results widen automatically when it does).
+- **Exclude with `-`** — prefix a term with a dash to hide anything whose name or
+  description contains it: `flight -staff` finds flight items that never mention
+  a staff, and a query of *only* exclusions (`-staff`) filters the whole list
+  instead of searching it. Exclusions are literal, case-insensitive substrings —
+  `-staff` also hides *Quarterstaff* — because the prefix/fuzzy matching that
+  helps you *find* things is a liability when it silently *hides* them. A dash
+  mid-word (`fatal-aim`) is just part of the term.
 - **Act on a result** — click to see the detail pane (matched tags + the snippets
   that earned them + enriched description); double-click / Enter / the open icon
   opens the item sheet; **drag** a result onto a sheet or the canvas to place it.
@@ -72,16 +86,21 @@ Two version numbers describe this module and they mean different things:
 
 | Where | Field | Value | Meaning |
 | --- | --- | --- | --- |
-| `module.json` | `compatibility.verified` | `12` | Foundry core version tested |
-| `module.json` | `relationships.systems` pf2e `verified` | `6.9.0` | PF2e system version tested |
-| `data/ability-tags.json` | `pf2eSystemVersion` | `8.3.0` | PF2e data the **tag map** was authored against |
+| `module.json` | `compatibility.verified` | `14` | Foundry core version tested |
+| `module.json` | `relationships.systems` pf2e `verified` | `8.4.0` | PF2e system version tested |
+| `data/ability-tags.json` | `pf2eSystemVersion` | `8.4.0` | PF2e data the **tag map** was authored against |
 
-The bundled tag map was exported from a PF2e **8.3.0** clone but keys items by
-compendium `_id` (slug fallback), and those `_id`s resolve **99.5%** against the
-live **6.9.0** compendium (2872 / 2886 magical items joined; see the coverage
-report logged at `ready`). So `pf2eSystemVersion` records the data's origin, not a
-system requirement — it is expected to differ from the `verified` fields until the
-tag map is re-exported (see below).
+The bundled tag map keys items by compendium `_id` (slug fallback). Against a live
+PF2e **8.4.0** compendium all **3488** map entries resolve — 100%, no orphans — and
+they cover **89%** of the 3915 magical items the module indexes. `pf2eSystemVersion`
+records the data's origin rather than a system requirement, so it is expected to
+drift from the `verified` fields until the map is re-exported (see below).
+
+The **427 untagged** items are searchable by name, description, and every
+structured filter; they simply carry no ability tags yet. Most are *specific magic
+items* — the remaster stamps them with runes instead of the `magical` trait, so the
+offline tagging pipeline (which still keys on that trait) hasn't seen them. They
+pick up tags on the next map re-export.
 
 ## Refreshing the tag map (maintainer workflow)
 

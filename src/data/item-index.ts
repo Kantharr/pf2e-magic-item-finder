@@ -1,6 +1,12 @@
 import { MODULE_ID } from "../constants.js";
 import { sluggify } from "./sluggify.js";
-import { EQUIPMENT_PACK_ID, PACK_UUID_PREFIX, hasMagicalMarker } from "./coverage.js";
+import {
+  EQUIPMENT_PACK_ID,
+  PACK_UUID_PREFIX,
+  RUNE_INDEX_FIELDS,
+  isMagicalItem,
+  type RawRunes,
+} from "./coverage.js";
 import type { MatchMethod, TagMap, TagMapEntry } from "./tag-map.js";
 
 /**
@@ -23,6 +29,11 @@ const INDEX_FIELDS = [
   // or armor group. Drives the weapon-group / armor-category filters.
   "system.category",
   "system.group",
+  // How the item is wielded/worn; for weapons this is what the hands filter
+  // reads (held-in-one-hand / held-in-one-plus-hands / held-in-two-hands).
+  "system.usage.value",
+  // Etched runes — part of the "is it magical?" predicate (see isMagicalItem).
+  ...RUNE_INDEX_FIELDS,
 ] as const;
 
 /** Raw multi-denomination price object from `system.price.value` (any subset of keys). */
@@ -35,6 +46,34 @@ export interface RawPriceValue {
 
 /** How the item was joined to a tag-map entry, or `null` when it has no tags. */
 export type TagJoin = "uuid" | "slug" | null;
+
+/**
+ * How many hands a weapon takes to wield: one, "one plus" (a bow or similar that
+ * needs a second hand free to fire), or two — matching PF2e's own hands filter.
+ */
+export type WeaponHands = "1" | "1+" | "2";
+
+/** `system.usage.value` → {@link WeaponHands}. */
+const USAGE_TO_HANDS: Record<string, WeaponHands> = {
+  "held-in-one-hand": "1",
+  "held-in-one-plus-hands": "1+",
+  "held-in-two-hands": "2",
+};
+
+/** Canonical order for the hands filter chips. */
+export const WEAPON_HANDS_ORDER: readonly WeaponHands[] = ["1", "1+", "2"];
+
+/**
+ * The hands a weapon occupies, or `null` for anything that isn't a hand-held
+ * weapon. Deliberately scoped to `type === "weapon"`: wands, scrolls, and most
+ * other equipment are also "held in one hand", and folding them in would make a
+ * *weapon* hands filter match half the corpus. Handwrap-style weapons (worn
+ * gloves) have no usable hand count and stay `null`.
+ */
+export function weaponHands(type: string, usage: string | null | undefined): WeaponHands | null {
+  if (type !== "weapon" || !usage) return null;
+  return USAGE_TO_HANDS[usage] ?? null;
+}
 
 /** One indexed item: compendium data + joined ability tags. */
 export interface IndexedItem {
@@ -62,6 +101,8 @@ export interface IndexedItem {
   /** `system.group`: the weapon group (sword, firearm…) or armor group; `null`
    * when absent. */
   group: string | null;
+  /** Hands the weapon occupies; `null` for non-weapons (see {@link weaponHands}). */
+  hands: WeaponHands | null;
   /** Matched tag names (dictionary order); empty when unmatched. */
   tags: string[];
   /** Tag name → evidence snippet. */
@@ -118,6 +159,7 @@ interface RawItem {
   type: string;
   category: string | null;
   group: string | null;
+  hands: WeaponHands | null;
 }
 
 interface RawIndexEntry {
@@ -133,6 +175,8 @@ interface RawIndexEntry {
     publication?: { title?: string };
     category?: string | null;
     group?: string | null;
+    usage?: { value?: string | null };
+    runes?: RawRunes | null;
   };
 }
 
@@ -180,9 +224,10 @@ async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
   const items: RawItem[] = [];
   for (const entry of index) {
     const traits = entry.system?.traits?.value ?? [];
-    if (!hasMagicalMarker(traits)) continue;
+    if (!isMagicalItem({ traits, runes: entry.system?.runes })) continue;
     const name = entry.name ?? "(unnamed)";
     const indexSlug = entry.system?.slug ?? null;
+    const type = entry.type ?? "equipment";
     items.push({
       uuid: PACK_UUID_PREFIX + entry._id,
       id: entry._id,
@@ -196,9 +241,10 @@ async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
       // when the index omits system.slug (mirrors the coverage reader).
       slug: indexSlug ?? sluggify(name),
       img: entry.img ?? null,
-      type: entry.type ?? "equipment",
+      type,
       category: entry.system?.category ?? null,
       group: entry.system?.group ?? null,
+      hands: weaponHands(type, entry.system?.usage?.value),
     });
   }
   return items;
@@ -255,6 +301,7 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
       type: r.type,
       category: r.category,
       group: r.group,
+      hands: r.hands,
       tags,
       snippets: entry?.snippets ?? {},
       matchMethod: entry?.matchMethod ?? {},
@@ -334,11 +381,22 @@ export function descriptionToText(html: string): string {
  * uuid — the payload {@link import("../search/query-engine.js").SearchEngine.setDescriptions}
  * needs to make description search work.
  *
- * Loads the whole pack in one `getDocuments()` call rather than thousands of
- * per-item `fromUuid` round trips (see {@link fetchItemDescription}, which stays
- * the right tool for the single selected item). Only the flattened text is kept,
- * so the documents themselves are free to be collected afterwards. Items with no
- * description are simply absent from the result.
+ * Reads the **compendium index** with `system.description.value` projected in,
+ * rather than `getDocuments()`. Both make a single round trip and return the
+ * whole pack, but `getDocuments()` additionally instantiates ~5.8k *live PF2e
+ * Item documents* — DataModel validation, migration, and rule-element
+ * construction for every one — and we throw all of that away to keep one string
+ * each. The index path returns plain projected objects and skips it entirely.
+ * ({@link fetchItemDescription} stays the right tool for the single selected
+ * item.)
+ *
+ * The cost of the swap is that Foundry caches what it indexes, so the pack's
+ * shared index retains the description HTML (~5MB here) for the session instead
+ * of releasing it. That is a fraction of what the discarded documents occupied
+ * while they existed, and it makes the module's other `getIndex` calls free
+ * afterwards (their fields become a subset of what is already indexed).
+ *
+ * Items with no description are simply absent from the result.
  */
 export async function loadItemDescriptions(index: ItemIndex): Promise<Record<string, string>> {
   const pack = game.packs?.get(EQUIPMENT_PACK_ID);
@@ -347,23 +405,27 @@ export async function loadItemDescriptions(index: ItemIndex): Promise<Record<str
       `${MODULE_ID} | equipment pack "${EQUIPMENT_PACK_ID}" not found; is the PF2e system active?`,
     );
   }
-  const getDocuments = (pack as {
-    getDocuments: () => Promise<Iterable<{
+  const getIndex = (pack as {
+    getIndex: (options?: { fields?: readonly string[] }) => Promise<Iterable<{
+      _id?: string;
       uuid?: string;
-      id?: string;
       system?: { description?: { value?: string } };
     }>>;
-  }).getDocuments;
-  const docs = await getDocuments.call(pack);
+  }).getIndex;
+  // Re-request the fields the item index already uses alongside the description,
+  // so this call supersedes the cached index instead of narrowing it.
+  const entries = await getIndex.call(pack, {
+    fields: [...INDEX_FIELDS, "system.description.value"],
+  });
 
   const out: Record<string, string> = {};
-  for (const doc of docs) {
-    // Compose the uuid from the id if the document doesn't carry one, so the
+  for (const entry of entries) {
+    // Index entries carry `uuid`, but compose it from `_id` as a fallback so the
     // join matches the index's key exactly (same prefix the index builds with).
-    const uuid = doc.uuid ?? (doc.id ? PACK_UUID_PREFIX + doc.id : null);
+    const uuid = entry.uuid ?? (entry._id ? PACK_UUID_PREFIX + entry._id : null);
     // Only the magical items we actually index are worth carrying.
     if (!uuid || !index.byUuid.has(uuid)) continue;
-    const raw = doc.system?.description?.value;
+    const raw = entry.system?.description?.value;
     if (!raw) continue;
     const text = descriptionToText(raw);
     if (text) out[uuid] = text;

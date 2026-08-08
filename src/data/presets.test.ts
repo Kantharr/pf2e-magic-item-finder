@@ -16,6 +16,7 @@ const options: FilterOptionLists = {
   traits: ["fire", "invested", "magical"],
   weaponGroups: ["sword", "firearm", "bow"],
   armorCategories: ["light", "medium", "heavy"],
+  hands: ["1", "1+", "2"],
   rarities: ["common", "uncommon", "rare"],
   levelRange: { min: 0, max: 20 },
   priceRange: { min: 1, max: 100000 },

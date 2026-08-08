@@ -24,6 +24,7 @@ function makeItem(partial: Partial<IndexedItem> & { name: string }): IndexedItem
     type: "equipment",
     category: null,
     group: null,
+    hands: null,
     tags: partial.tags ?? [],
     snippets: {},
     matchMethod: {},
