@@ -26,6 +26,9 @@ interface ItemSpec {
   group?: string | null;
   /** Hands the weapon occupies ("1" / "1+" / "2"); non-weapons leave this null. */
   hands?: WeaponHands | null;
+  /** Whether the item is magical. Defaults to true, so the pre-existing fixture
+   * (all magic items) keeps its original meaning. */
+  magical?: boolean;
 }
 
 /** Build a full {@link IndexedItem} from a terse spec (uuid derived from name). */
@@ -46,6 +49,7 @@ function makeItem(spec: ItemSpec): IndexedItem {
     category: spec.category ?? null,
     group: spec.group ?? null,
     hands: spec.hands ?? null,
+    magical: spec.magical ?? true,
     tags: spec.tags,
     snippets: {},
     matchMethod: {},
@@ -73,6 +77,8 @@ function makeIndex(specs: ItemSpec[]): ItemIndex {
     builtAt: 0,
     stats: {
       total: items.length,
+      magical: items.filter((i) => i.magical).length,
+      mundane: items.filter((i) => !i.magical).length,
       matched: items.filter((i) => i.tags.length > 0).length,
       matchedByUuid: items.filter((i) => i.tags.length > 0).length,
       rescuedBySlug: 0,
@@ -700,5 +706,63 @@ describe("weapon hands filter", () => {
   it("matches everything when nothing is selected", () => {
     expect(engine.query({ hands: [] }).total).toBe(HANDED.length);
     expect(engine.query({}).total).toBe(HANDED.length);
+  });
+});
+
+/**
+ * The magic axis. The corpus spans magical *and* mundane equipment, so the
+ * headline requirement is that the default view shows both — narrowing to either
+ * half is opt-in.
+ */
+describe("magic filter", () => {
+  const MIXED: ItemSpec[] = [
+    { name: "Flaming Longsword", level: 8, rarity: "common", traits: ["magical"], priceGp: 200, tags: ["Damage"], type: "weapon", category: "martial", group: "sword" },
+    { name: "Iris of the Sky", level: 6, rarity: "unique", traits: [], priceGp: 240, tags: [], type: "weapon", category: "martial", group: "firearm" },
+    // Mundane gear — invisible to the module before this axis existed.
+    { name: "Longsword", level: 0, rarity: "common", traits: [], priceGp: 1, tags: [], type: "weapon", category: "martial", group: "sword", magical: false },
+    { name: "Rations", level: 0, rarity: "common", traits: [], priceGp: 0.4, tags: [], magical: false },
+    { name: "Leather Armor", level: 0, rarity: "common", traits: [], priceGp: 2, tags: [], type: "armor", category: "light", group: "leather", magical: false },
+  ];
+  const engine = createSearchEngine(makeIndex(MIXED), { categories: CATEGORIES });
+  const run = (state: FilterState): string[] =>
+    engine.query(state).items.map((i) => i.name).sort();
+
+  it("returns both kinds by default", () => {
+    expect(engine.query({}).total).toBe(MIXED.length);
+    expect(run({})).toContain("Rations");
+    expect(run({})).toContain("Flaming Longsword");
+  });
+
+  it("filters out non-magical items", () => {
+    expect(run({ magic: ["magical"] })).toEqual(["Flaming Longsword", "Iris of the Sky"]);
+  });
+
+  it("filters out magical items", () => {
+    expect(run({ magic: ["mundane"] })).toEqual(["Leather Armor", "Longsword", "Rations"]);
+  });
+
+  it("treats both-selected and none-selected as the same thing", () => {
+    expect(engine.query({ magic: ["magical", "mundane"] }).total).toBe(MIXED.length);
+    expect(engine.query({ magic: [] }).total).toBe(MIXED.length);
+  });
+
+  it("ANDs with the other axes", () => {
+    // Both swords are in the sword group; only the mundane one survives.
+    expect(run({ magic: ["mundane"], weaponGroups: ["sword"] })).toEqual(["Longsword"]);
+  });
+
+  it("is subsumed by any ability-tag selection, since only magic items carry tags", () => {
+    expect(run({ tags: ["Damage"] })).toEqual(["Flaming Longsword"]);
+    // Asking for a tag *and* mundane items is contradictory, and yields nothing.
+    expect(run({ tags: ["Damage"], magic: ["mundane"] })).toEqual([]);
+  });
+
+  it("offers both values in canonical order, magical first", () => {
+    expect(engine.options.magic).toEqual(["magical", "mundane"]);
+  });
+
+  it("omits the half the corpus does not contain", () => {
+    const magicOnly = createSearchEngine(makeIndex(MIXED.filter((s) => s.magical !== false)));
+    expect(magicOnly.options.magic).toEqual(["magical"]);
   });
 });

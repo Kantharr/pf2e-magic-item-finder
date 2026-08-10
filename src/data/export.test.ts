@@ -25,6 +25,7 @@ function makeItem(partial: Partial<IndexedItem> & { name: string }): IndexedItem
     category: null,
     group: null,
     hands: null,
+    magical: partial.magical ?? true,
     tags: partial.tags ?? [],
     snippets: {},
     matchMethod: {},
@@ -41,6 +42,7 @@ describe("buildExportRows", () => {
       name: "Flaming Sword",
       level: 8,
       rarity: "uncommon",
+      magical: true,
       priceGp: 500,
       traits: ["fire", "magical"],
       tags: ["Damage", "Fire"],
@@ -53,8 +55,8 @@ describe("toCsv", () => {
   it("emits the header + one CRLF-terminated line per row", () => {
     const csv = toCsv(buildExportRows([makeItem({ name: "Torch", level: 0, rarity: "common", priceGp: 0.1, source: "CRB" })]));
     expect(csv).toBe(
-      "Name,Level,Rarity,Price (gp),Traits,Tags,Source\r\n" +
-        "Torch,0,common,0.1,,,CRB\r\n",
+      "Name,Level,Rarity,Magical,Price (gp),Traits,Tags,Source\r\n" +
+        "Torch,0,common,Yes,0.1,,,CRB\r\n",
     );
   });
 
@@ -65,12 +67,19 @@ describe("toCsv", () => {
       ]),
     );
     const line = csv.split("\r\n")[1];
-    expect(line).toBe('"Ring of ""Wishes""",1,common,,"magical, invested","Wish, Teleport",GMG');
+    expect(line).toBe('"Ring of ""Wishes""",1,common,Yes,,"magical, invested","Wish, Teleport",GMG');
   });
 
   it("leaves the price blank for priceless items", () => {
     const csv = toCsv(buildExportRows([makeItem({ name: "Artifact", priceGp: null })]));
-    expect(csv.split("\r\n")[1]).toBe("Artifact,1,common,,,,");
+    expect(csv.split("\r\n")[1]).toBe("Artifact,1,common,Yes,,,,");
+  });
+
+  it("marks mundane items No in the Magical column", () => {
+    const csv = toCsv(
+      buildExportRows([makeItem({ name: "Longsword", priceGp: 1, magical: false })]),
+    );
+    expect(csv.split("\r\n")[1]).toBe("Longsword,1,common,No,1,,,");
   });
 
   it("keeps prices numeric (no thousands separators) so spreadsheets parse them", () => {
@@ -84,7 +93,7 @@ describe("toJson", () => {
     const rows = buildExportRows([makeItem({ name: "Wand", level: 3, priceGp: 60, tags: ["Fire"] })]);
     const parsed = JSON.parse(toJson(rows));
     expect(parsed).toEqual([
-      { name: "Wand", level: 3, rarity: "common", priceGp: 60, traits: [], tags: ["Fire"], source: null },
+      { name: "Wand", level: 3, rarity: "common", magical: true, priceGp: 60, traits: [], tags: ["Fire"], source: null },
     ]);
   });
 });

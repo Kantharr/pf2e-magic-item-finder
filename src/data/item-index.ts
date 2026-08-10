@@ -10,10 +10,16 @@ import {
 import type { MatchMethod, TagMap, TagMapEntry } from "./tag-map.js";
 
 /**
- * Phase 3 — the in-memory item model. One entry per magical item in
- * `pf2e.equipment-srd`, combining the live compendium index fields with the
- * bundled ability tags (joined by uuid, slug fallback). Built once at `ready`
- * and reused by the search engine (Phase 4) and UI (Phase 5).
+ * Phase 3 — the in-memory item model. One entry per item in
+ * `pf2e.equipment-srd` — magical *and* mundane — combining the live compendium
+ * index fields with the bundled ability tags (joined by uuid, slug fallback).
+ * Built once at `ready` and reused by the search engine (Phase 4) and UI
+ * (Phase 5).
+ *
+ * Only magical items can carry ability tags (the bundled map covers just them),
+ * so mundane entries land here with an empty `tags[]` and are reachable by name,
+ * trait, and the other structured filters. {@link IndexedItem.magical} records
+ * which is which, and backs the engine's `magic` filter axis.
  */
 
 /** Fields requested from `pack.getIndex()` beyond the defaults (`_id`, `name`, `img`, `type`). */
@@ -103,6 +109,12 @@ export interface IndexedItem {
   group: string | null;
   /** Hands the weapon occupies; `null` for non-weapons (see {@link weaponHands}). */
   hands: WeaponHands | null;
+  /**
+   * Whether the item is magical per {@link isMagicalItem} (a marker trait *or* an
+   * etched rune). Backs the `magic` filter axis. Mundane items never carry
+   * ability tags, since the bundled map only covers the magical half.
+   */
+  magical: boolean;
   /** Matched tag names (dictionary order); empty when unmatched. */
   tags: string[];
   /** Tag name → evidence snippet. */
@@ -115,13 +127,22 @@ export interface IndexedItem {
 
 /** Per-build counts for the index (fed to {@link logItemIndex}). */
 export interface ItemIndexStats {
-  /** Magical items indexed (== `items.length`). */
+  /** Items indexed, magical + mundane (== `items.length`). */
   total: number;
+  /** Magical items indexed — the denominator for the tag-join hit rate. */
+  magical: number;
+  /** Mundane items indexed (== `total - magical`). */
+  mundane: number;
   /** Items that joined a tag-map entry (the tag-join hit rate). */
   matched: number;
   matchedByUuid: number;
   rescuedBySlug: number;
-  /** Items with no map entry at all (still searchable by name/filters). */
+  /**
+   * **Magical** items with no map entry at all (still searchable by name and the
+   * structured filters). Mundane items are excluded from this count: they have no
+   * map entry by construction, so folding them in would report ~2.4k phantom
+   * misses.
+   */
   unmatched: number;
   /**
    * Items carrying at least one tag. Less than {@link matched}: some joined
@@ -160,6 +181,7 @@ interface RawItem {
   category: string | null;
   group: string | null;
   hands: WeaponHands | null;
+  magical: boolean;
 }
 
 interface RawIndexEntry {
@@ -207,12 +229,17 @@ export async function buildItemIndex(tagMap: TagMap): Promise<ItemIndex> {
       `${MODULE_ID} | equipment pack "${EQUIPMENT_PACK_ID}" not found; is the PF2e system active?`,
     );
   }
-  const raw = await readMagicalItems(pack);
+  const raw = await readItems(pack);
   return assembleIndex(tagMap, raw);
 }
 
-/** Pull the magical items from the pack index with the fields the model needs. */
-async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
+/**
+ * Pull **every** item from the pack index with the fields the model needs.
+ * Magical and mundane alike: `isMagicalItem` is recorded per item rather than
+ * used as a gate, so the `magic` filter axis can narrow to either half while the
+ * default view spans both.
+ */
+async function readItems(pack: unknown): Promise<RawItem[]> {
   // getIndex's typed signature varies across fvtt-types/Foundry lines; the
   // `fields` option is honoured at runtime (v12+). Cast narrowly here, matching
   // the coverage reader.
@@ -224,11 +251,11 @@ async function readMagicalItems(pack: unknown): Promise<RawItem[]> {
   const items: RawItem[] = [];
   for (const entry of index) {
     const traits = entry.system?.traits?.value ?? [];
-    if (!isMagicalItem({ traits, runes: entry.system?.runes })) continue;
     const name = entry.name ?? "(unnamed)";
     const indexSlug = entry.system?.slug ?? null;
     const type = entry.type ?? "equipment";
     items.push({
+      magical: isMagicalItem({ traits, runes: entry.system?.runes }),
       uuid: PACK_UUID_PREFIX + entry._id,
       id: entry._id,
       name,
@@ -268,9 +295,11 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
   let matchedByUuid = 0;
   let rescuedBySlug = 0;
   let withTags = 0;
+  let magical = 0;
 
   for (const r of raw) {
     if (byUuid.has(r.uuid)) continue; // de-dupe defensively
+    if (r.magical) magical++;
 
     let joinedBy: TagJoin = null;
     let entry: TagMapEntry | undefined = tagMap.tags[r.uuid];
@@ -302,6 +331,7 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
       category: r.category,
       group: r.group,
       hands: r.hands,
+      magical: r.magical,
       tags,
       snippets: entry?.snippets ?? {},
       matchMethod: entry?.matchMethod ?? {},
@@ -325,10 +355,14 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
     builtAt: Date.now(),
     stats: {
       total: items.length,
+      magical,
+      mundane: items.length - magical,
       matched,
       matchedByUuid,
       rescuedBySlug,
-      unmatched: items.length - matched,
+      // Against the magical half only: mundane items have no map entry by
+      // construction, so counting them as misses would be meaningless.
+      unmatched: magical - matched,
       withTags,
       tagCount: tagToItemIds.size,
     },
@@ -423,7 +457,7 @@ export async function loadItemDescriptions(index: ItemIndex): Promise<Record<str
     // Index entries carry `uuid`, but compose it from `_id` as a fallback so the
     // join matches the index's key exactly (same prefix the index builds with).
     const uuid = entry.uuid ?? (entry._id ? PACK_UUID_PREFIX + entry._id : null);
-    // Only the magical items we actually index are worth carrying.
+    // Only the items we actually index are worth carrying.
     if (!uuid || !index.byUuid.has(uuid)) continue;
     const raw = entry.system?.description?.value;
     if (!raw) continue;
@@ -433,14 +467,20 @@ export async function loadItemDescriptions(index: ItemIndex): Promise<Record<str
   return out;
 }
 
-/** One-line console summary of a built index (size + tag-join hit rate). */
+/**
+ * One-line console summary of a built index (size + tag-join hit rate). The hit
+ * rate is a percentage of the **magical** items, not of `total` — only they can
+ * join the tag map, so dividing by the whole corpus would report a permanent
+ * ~59% and look like a regression against the magic-only builds.
+ */
 export function logItemIndex(index: ItemIndex): void {
   const s = index.stats;
-  const rate = s.total ? ((s.matched / s.total) * 100).toFixed(1) : "0.0";
+  const rate = s.magical ? ((s.matched / s.magical) * 100).toFixed(1) : "0.0";
   console.log(
-    `${MODULE_ID} | item index built: ${s.total} magical items, ${s.matched} joined ` +
-      `(${rate}% hit rate: ${s.matchedByUuid} by uuid, ${s.rescuedBySlug} by slug), ` +
-      `${s.unmatched} unmatched, ${s.withTags} with tags, ${s.tagCount} distinct tags indexed`,
+    `${MODULE_ID} | item index built: ${s.total} items ` +
+      `(${s.magical} magical, ${s.mundane} non-magical), ${s.matched} joined ` +
+      `(${rate}% hit rate over magical: ${s.matchedByUuid} by uuid, ${s.rescuedBySlug} by slug), ` +
+      `${s.unmatched} magical unmatched, ${s.withTags} with tags, ${s.tagCount} distinct tags indexed`,
   );
 }
 

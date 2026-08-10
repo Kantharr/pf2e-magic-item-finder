@@ -77,6 +77,7 @@ function sanitizeState(state: FilterState): FilterState {
   if (state.minPriceGp != null) out.minPriceGp = state.minPriceGp;
   if (state.maxPriceGp != null) out.maxPriceGp = state.maxPriceGp;
   if (state.includePriceless) out.includePriceless = true;
+  if (state.magic?.length) out.magic = [...state.magic];
   if (state.rarities?.length) out.rarities = [...state.rarities];
   if (state.traits?.length) out.traits = [...state.traits];
   if (state.weaponGroups?.length) out.weaponGroups = [...state.weaponGroups];
@@ -158,6 +159,7 @@ export function coerceAppliedState(
   const armorCategorySet = new Set(options.armorCategories);
   const handsSet = new Set<string>(options.hands);
   const raritySet = new Set(options.rarities);
+  const magicSet = new Set(options.magic);
 
   const keep = (values: readonly string[] | undefined, allowed: Set<string>): string[] | undefined => {
     if (!values?.length) return undefined;
@@ -175,6 +177,9 @@ export function coerceAppliedState(
     minPriceGp: state.minPriceGp ?? undefined,
     maxPriceGp: state.maxPriceGp ?? undefined,
     includePriceless: state.includePriceless ? true : undefined,
+    // Presets saved before mundane items were indexed carry no `magic` key, so
+    // they widen to both halves — the same default a freshly cleared filter has.
+    magic: keep(state.magic, magicSet),
     rarities: keep(state.rarities, raritySet),
     traits: keep(state.traits, traitSet),
     weaponGroups: keep(state.weaponGroups, weaponGroupSet),

@@ -19,7 +19,7 @@ export type SortField = "name" | "level" | "price" | "relevance";
 export type SortDir = "asc" | "desc";
 
 /** The composed filter state for a single query. Every field is optional; an
- * all-empty state matches the full magical list. */
+ * all-empty state matches the full corpus, magical and mundane alike. */
 export interface FilterState {
   /**
    * Free-text query, matched against item names **and** description bodies
@@ -37,6 +37,16 @@ export interface FilterState {
   /** Inclusive level bounds; null/undefined = unbounded on that side. */
   minLevel?: number | null;
   maxLevel?: number | null;
+  /**
+   * Whether to keep magical items, mundane ones, or both — `"magical"` and/or
+   * `"mundane"` (OR within, like every other multi-select here). Empty or absent
+   * = both, which is the default view; selecting one value filters the other kind
+   * out, and selecting both is the same as selecting neither.
+   *
+   * Note that only magical items carry ability tags, so any {@link tags}
+   * selection already excludes mundane items on its own.
+   */
+  magic?: readonly string[];
   /** Selected rarity values (OR within). Empty = any rarity. */
   rarities?: readonly string[];
   /** Selected trait slugs (OR within). Empty = any traits. */
@@ -104,6 +114,8 @@ export interface TagOption {
 export interface FilterOptionLists {
   /** Ability-tag categories (full dictionary when provided, else those present). */
   tags: TagOption[];
+  /** Which of `magical` / `mundane` the corpus actually contains, in that order. */
+  magic: string[];
   /** Distinct trait slugs present in the corpus, A→Z. */
   traits: string[];
   /** Distinct weapon groups present among weapons, A→Z. */
@@ -140,14 +152,18 @@ export interface SearchEngineOptions {
 
 /**
  * One shared collator for name ordering. `String.prototype.localeCompare` builds
- * a collator per *call*, which dominates every large query — sorting the full
- * ~3.9k-item corpus cost ~260ms that way versus ~10ms here. Same locale and
- * sensitivity, so the ordering is unchanged.
+ * a collator per *call*, which dominates every large query — sorting the corpus
+ * cost ~260ms that way versus ~10ms here (measured at ~3.9k items; the corpus is
+ * ~5.9k now that mundane items are indexed, so the gap is wider still). Same
+ * locale and sensitivity, so the ordering is unchanged.
  */
 const NAME_COLLATOR = new Intl.Collator(undefined, { sensitivity: "base" });
 
 /** Canonical PF2e rarity order (rarest last). */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
+
+/** The two values of the magic axis, in the order the UI offers them. */
+export const MAGIC_VALUES = ["magical", "mundane"] as const;
 
 /** Canonical armor-category order (lightest first); others trail alphabetically. */
 const ARMOR_CATEGORY_ORDER = ["light", "medium", "heavy"] as const;
@@ -163,11 +179,12 @@ interface TextDoc {
  * Documents per chunk when folding descriptions in asynchronously.
  *
  * `addAllAsync` yields to the event loop (a `setTimeout(0)`) between chunks, so
- * this trades total wall-clock for responsiveness: the whole-corpus rebuild is
- * ~460ms of work over ~3.9k items (~0.12ms each), and 100 keeps each chunk near
- * a single 60fps frame instead of one ~460ms block that freezes typing. Do not
- * use MiniSearch's default of 10 — that would be ~390 yields, and the timer
- * clamp alone would cost more than the work.
+ * this trades total wall-clock for responsiveness: the rebuild costs ~0.12ms per
+ * item (~460ms over the ~3.9k magical-only corpus this was tuned against, ~700ms
+ * over the ~5.9k items indexed since mundane ones were included), and 100 keeps
+ * each chunk near a single 60fps frame instead of one long block that freezes
+ * typing. Do not use MiniSearch's default of 10 — that would be ~590 yields, and
+ * the timer clamp alone would cost more than the work.
  */
 const TEXT_INDEX_CHUNK_SIZE = 100;
 
@@ -441,6 +458,12 @@ function matchesStructured(item: IndexedItem, state: FilterState): boolean {
   if (state.minLevel != null && item.level < state.minLevel) return false;
   if (state.maxLevel != null && item.level > state.maxLevel) return false;
 
+  if (state.magic && state.magic.length > 0) {
+    // Selecting both values is the same as selecting neither, which falls out of
+    // the membership test rather than needing a special case.
+    if (!state.magic.includes(item.magical ? "magical" : "mundane")) return false;
+  }
+
   if (state.rarities && state.rarities.length > 0 && !state.rarities.includes(item.rarity)) {
     return false;
   }
@@ -554,6 +577,12 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
   for (const item of index.items) for (const t of item.traits) traitSet.add(t);
   const traits = [...traitSet].sort((a, b) => a.localeCompare(b));
 
+  // Magic: only the halves actually present, so a corpus that is entirely one or
+  // the other doesn't render a filter that can only ever be a no-op.
+  const magicSet = new Set<string>();
+  for (const item of index.items) magicSet.add(item.magical ? "magical" : "mundane");
+  const magic = MAGIC_VALUES.filter((v) => magicSet.has(v));
+
   // Weapon groups (from weapons) and armor categories (from armor), each
   // distinct across the corpus. Armor categories follow the canonical
   // light→heavy order; anything unexpected trails alphabetically.
@@ -598,5 +627,5 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
     : { min: 0, max: 0 };
   const priceRange = anyPriced ? { min: minPrice, max: maxPrice } : null;
 
-  return { tags, traits, weaponGroups, armorCategories, hands, rarities, levelRange, priceRange };
+  return { tags, magic, traits, weaponGroups, armorCategories, hands, rarities, levelRange, priceRange };
 }

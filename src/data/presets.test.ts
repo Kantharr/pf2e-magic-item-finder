@@ -13,6 +13,7 @@ const options: FilterOptionLists = {
     { name: "Flight", count: 12 },
     { name: "Healing", count: 30 },
   ],
+  magic: ["magical", "mundane"],
   traits: ["fire", "invested", "magical"],
   weaponGroups: ["sword", "firearm", "bow"],
   armorCategories: ["light", "medium", "heavy"],
@@ -76,6 +77,19 @@ describe("coerceAppliedState", () => {
     const out = coerceAppliedState({ tags: ["Gone"], traits: ["Gone"] }, options);
     expect(out.tags).toBeUndefined();
     expect(out.traits).toBeUndefined();
+  });
+
+  it("carries the magic axis through, dropping unknown values", () => {
+    expect(coerceAppliedState({ magic: ["mundane"] }, options).magic).toEqual(["mundane"]);
+    expect(coerceAppliedState({ magic: ["mundane", "ethereal"] }, options).magic).toEqual([
+      "mundane",
+    ]);
+    expect(coerceAppliedState({ magic: ["ethereal"] }, options).magic).toBeUndefined();
+  });
+
+  it("leaves a pre-magic-axis preset unfiltered, matching the both-kinds default", () => {
+    // Presets saved before mundane items were indexed have no `magic` key at all.
+    expect(coerceAppliedState({ tags: ["Flight"] }, options).magic).toBeUndefined();
   });
 
   it("rejects an invalid sort/sortDir that doesn't survive a schema change", () => {

@@ -9,51 +9,51 @@
   <div class="pf2e-mif-results-toolbar">
     <div class="pf2e-mif-count">
       {{#if results.empty}}
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.None"}}
+        {{localize "PF2E_ITEM_FINDER.Results.None"}}
       {{else}}
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Count" total=results.total}}
+        {{localize "PF2E_ITEM_FINDER.Results.Count" total=results.total}}
       {{/if}}
     </div>
     {{!-- Export the current filtered set (not the whole index). Sorting now
           lives on the clickable column headers below. --}}
     <div class="pf2e-mif-export">
       <button type="button" data-action="exportCsv" {{#if results.empty}}disabled{{/if}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.CsvTip"}}">
-        <i class="fa-solid fa-file-csv"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Csv"}}
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Export.CsvTip"}}">
+        <i class="fa-solid fa-file-csv"></i> {{localize "PF2E_ITEM_FINDER.Export.Csv"}}
       </button>
       <button type="button" data-action="exportJson" {{#if results.empty}}disabled{{/if}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Export.JsonTip"}}">
-        <i class="fa-solid fa-file-code"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Export.Json"}}
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Export.JsonTip"}}">
+        <i class="fa-solid fa-file-code"></i> {{localize "PF2E_ITEM_FINDER.Export.Json"}}
       </button>
     </div>
   </div>
 
   <div class="pf2e-mif-results" tabindex="0" role="listbox"
-       aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.List"}}">
+       aria-label="{{localize "PF2E_ITEM_FINDER.Results.List"}}">
     <div class="pf2e-mif-row pf2e-mif-head">
       <span class="col-name pf2e-mif-sortable{{#if results.sort.name.active}} sorted{{/if}}"
             role="button" tabindex="0" data-action="sortColumn" data-sort="name"
             aria-sort="{{#if results.sort.name.asc}}ascending{{else}}{{#if results.sort.name.desc}}descending{{else}}none{{/if}}{{/if}}"
-            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Name"}}
+            data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_ITEM_FINDER.Results.Name"}}
         <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.name.asc}}fa-caret-up{{else}}{{#if results.sort.name.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
       </span>
       <span class="col-level pf2e-mif-sortable{{#if results.sort.level.active}} sorted{{/if}}"
             role="button" tabindex="0" data-action="sortColumn" data-sort="level"
             aria-sort="{{#if results.sort.level.asc}}ascending{{else}}{{#if results.sort.level.desc}}descending{{else}}none{{/if}}{{/if}}"
-            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Level"}}
+            data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_ITEM_FINDER.Results.Level"}}
         <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.level.asc}}fa-caret-up{{else}}{{#if results.sort.level.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
       </span>
-      <span class="col-rarity">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Rarity"}}</span>
+      <span class="col-rarity">{{localize "PF2E_ITEM_FINDER.Results.Rarity"}}</span>
       <span class="col-price pf2e-mif-sortable{{#if results.sort.price.active}} sorted{{/if}}"
             role="button" tabindex="0" data-action="sortColumn" data-sort="price"
             aria-sort="{{#if results.sort.price.asc}}ascending{{else}}{{#if results.sort.price.desc}}descending{{else}}none{{/if}}{{/if}}"
-            data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.SortBy"}}">
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Price"}}
+            data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.SortBy"}}">
+        {{localize "PF2E_ITEM_FINDER.Results.Price"}}
         <i class="pf2e-mif-sort-icon fa-solid {{#if results.sort.price.asc}}fa-caret-up{{else}}{{#if results.sort.price.desc}}fa-caret-down{{else}}fa-sort{{/if}}{{/if}}"></i>
       </span>
-      <span class="col-traits">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Traits"}}</span>
+      <span class="col-traits">{{localize "PF2E_ITEM_FINDER.Results.Traits"}}</span>
     </div>
     {{#each results.rows}}
     <div class="pf2e-mif-row rarity-{{rarity}}{{#if selected}} selected{{/if}}" role="option"
@@ -61,8 +61,8 @@
       <span class="col-name">
         {{#if img}}<img class="row-img" src="{{img}}" alt="" loading="lazy" />{{/if}}
         <span class="row-name-text">{{name}}</span>
-        <a class="row-open" data-action="openItem" data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Open"}}"
-           aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.Open"}}"><i class="fa-solid fa-up-right-from-square"></i></a>
+        <a class="row-open" data-action="openItem" data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.Open"}}"
+           aria-label="{{localize "PF2E_ITEM_FINDER.Results.Open"}}"><i class="fa-solid fa-up-right-from-square"></i></a>
       </span>
       <span class="col-level">{{level}}</span>
       <span class="col-rarity"><span class="rarity-dot rarity-{{rarity}}"></span>{{rarityLabel}}</span>
@@ -73,7 +73,7 @@
   </div>
 
   <div class="pf2e-mif-pagination">
-    <label class="pf2e-mif-pagesize">{{localize "PF2E_MAGIC_ITEM_FINDER.Results.RowsPerPage"}}
+    <label class="pf2e-mif-pagesize">{{localize "PF2E_ITEM_FINDER.Results.RowsPerPage"}}
       <select data-page-size="select">
         {{#each results.pageSizeOptions}}
         <option value="{{value}}"{{#if selected}} selected{{/if}}>{{value}}</option>
@@ -82,27 +82,27 @@
     </label>
     <div class="pf2e-mif-pagenav">
       <button type="button" data-action="firstPage" {{#unless results.canPrev}}disabled{{/unless}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.FirstPage"}}">
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.FirstPage"}}">
         <i class="fa-solid fa-angles-left"></i>
       </button>
       <button type="button" data-action="prevPage" {{#unless results.canPrev}}disabled{{/unless}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.PrevPage"}}">
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.PrevPage"}}">
         <i class="fa-solid fa-angle-left"></i>
       </button>
       <span class="pf2e-mif-pageinfo">
-        {{localize "PF2E_MAGIC_ITEM_FINDER.Results.Page" page=results.page totalPages=results.totalPages}}
+        {{localize "PF2E_ITEM_FINDER.Results.Page" page=results.page totalPages=results.totalPages}}
       </span>
       <button type="button" data-action="nextPage" {{#unless results.canNext}}disabled{{/unless}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.NextPage"}}">
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.NextPage"}}">
         <i class="fa-solid fa-angle-right"></i>
       </button>
       <button type="button" data-action="lastPage" {{#unless results.canNext}}disabled{{/unless}}
-              data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Results.LastPage"}}">
+              data-tooltip="{{localize "PF2E_ITEM_FINDER.Results.LastPage"}}">
         <i class="fa-solid fa-angles-right"></i>
       </button>
     </div>
   </div>
   {{else}}
-  <p class="pf2e-mif-loading">{{localize "PF2E_MAGIC_ITEM_FINDER.App.Loading"}}</p>
+  <p class="pf2e-mif-loading">{{localize "PF2E_ITEM_FINDER.App.Loading"}}</p>
   {{/if}}
 </section>

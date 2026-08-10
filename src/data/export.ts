@@ -6,7 +6,7 @@ import type { IndexedItem } from "./item-index.js";
  * lives in {@link triggerDownload} and the `download*` helpers.
  *
  * Columns mirror the results list plus the matched ability **Tags**:
- * `Name, Level, Rarity, Price (gp), Traits, Tags, Source`.
+ * `Name, Level, Rarity, Magical, Price (gp), Traits, Tags, Source`.
  */
 
 /** One flat export row derived from an {@link IndexedItem}. */
@@ -14,6 +14,8 @@ export interface ExportRow {
   name: string;
   level: number;
   rarity: string;
+  /** Whether the item is magical (see {@link IndexedItem.magical}). */
+  magical: boolean;
   /** gp-equivalent price, or null for priceless items. */
   priceGp: number | null;
   /** Trait slugs. */
@@ -25,7 +27,16 @@ export interface ExportRow {
 }
 
 /** CSV header row (also the JSON field order intent). */
-const CSV_HEADERS = ["Name", "Level", "Rarity", "Price (gp)", "Traits", "Tags", "Source"] as const;
+const CSV_HEADERS = [
+  "Name",
+  "Level",
+  "Rarity",
+  "Magical",
+  "Price (gp)",
+  "Traits",
+  "Tags",
+  "Source",
+] as const;
 
 /** Project the (already filtered + sorted) items into export rows. */
 export function buildExportRows(items: readonly IndexedItem[]): ExportRow[] {
@@ -33,6 +44,7 @@ export function buildExportRows(items: readonly IndexedItem[]): ExportRow[] {
     name: item.name,
     level: item.level,
     rarity: item.rarity,
+    magical: item.magical,
     priceGp: item.priceGp,
     traits: [...item.traits],
     tags: [...item.tags],
@@ -66,6 +78,7 @@ export function toCsv(rows: readonly ExportRow[]): string {
         r.name,
         String(r.level),
         r.rarity,
+        r.magical ? "Yes" : "No",
         formatPrice(r.priceGp),
         r.traits.join(", "),
         r.tags.join(", "),

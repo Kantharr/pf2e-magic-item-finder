@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { descriptionToText, weaponHands } from "./item-index.js";
+import { assembleIndex, descriptionToText, weaponHands } from "./item-index.js";
 import { hasMagicalMarker, hasMagicalRunes, isMagicalItem } from "./coverage.js";
+import type { TagMap } from "./tag-map.js";
 
 /**
  * The HTML → plain-text flattening behind description search. The bulk loader
@@ -76,6 +77,72 @@ describe("isMagicalItem", () => {
     ).toBe(true);
     // A plain jezail is neither.
     expect(isMagicalItem({ traits: ["concussive", "fatal-aim-d12"] })).toBe(false);
+  });
+});
+
+/**
+ * The pure assembly half of the index. The corpus spans magical and mundane
+ * items, and only the magical half can ever join the tag map — so the stats have
+ * to keep those two populations apart or the hit rate reads as a regression.
+ */
+describe("assembleIndex", () => {
+  const TAG_MAP: TagMap = {
+    schemaVersion: 1,
+    pf2eSystemVersion: "8.3.0",
+    generatedAt: "2026-01-01T00:00:00Z",
+    itemCount: 1,
+    categories: [{ name: "Damage", description: "Deals damage." }],
+    tags: {
+      "Compendium.pf2e.equipment-srd.Item.aaa": {
+        slug: "flaming-longsword",
+        name: "Flaming Longsword",
+        tags: ["Damage"],
+        snippets: { Damage: "deals 1d6 fire" },
+        matchMethod: { Damage: "regex" },
+      },
+    },
+  };
+
+  /** Two magical items (one tagged, one not) and two mundane ones. */
+  const RAW = [
+    { uuid: "Compendium.pf2e.equipment-srd.Item.aaa", id: "aaa", name: "Flaming Longsword", level: 8, rarity: "common", traits: ["magical"], price: { gp: 200 }, source: null, slug: "flaming-longsword", img: null, type: "weapon", category: "martial", group: "sword", hands: "1" as const, magical: true },
+    { uuid: "Compendium.pf2e.equipment-srd.Item.bbb", id: "bbb", name: "Iris of the Sky", level: 6, rarity: "unique", traits: [], price: null, source: null, slug: "iris-of-the-sky", img: null, type: "weapon", category: "martial", group: "firearm", hands: "1" as const, magical: true },
+    { uuid: "Compendium.pf2e.equipment-srd.Item.ccc", id: "ccc", name: "Longsword", level: 0, rarity: "common", traits: [], price: { gp: 1 }, source: null, slug: "longsword", img: null, type: "weapon", category: "martial", group: "sword", hands: "1" as const, magical: false },
+    { uuid: "Compendium.pf2e.equipment-srd.Item.ddd", id: "ddd", name: "Rations", level: 0, rarity: "common", traits: [], price: { sp: 4 }, source: null, slug: "rations", img: null, type: "consumable", category: null, group: null, hands: null, magical: false },
+  ];
+
+  it("indexes mundane items alongside magical ones, flagging each", () => {
+    const index = assembleIndex(TAG_MAP, RAW);
+    expect(index.items).toHaveLength(4);
+    expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.aaa")?.magical).toBe(true);
+    expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.ccc")?.magical).toBe(false);
+  });
+
+  it("splits the magical / mundane counts", () => {
+    const { stats } = assembleIndex(TAG_MAP, RAW);
+    expect(stats.total).toBe(4);
+    expect(stats.magical).toBe(2);
+    expect(stats.mundane).toBe(2);
+  });
+
+  it("counts unmatched against the magical half only", () => {
+    const { stats } = assembleIndex(TAG_MAP, RAW);
+    // One magical item joined; the other magical item did not. The two mundane
+    // items have no map entry by construction and must not count as misses.
+    expect(stats.matched).toBe(1);
+    expect(stats.unmatched).toBe(1);
+    expect(stats.withTags).toBe(1);
+  });
+
+  it("gives mundane items no tags", () => {
+    const index = assembleIndex(TAG_MAP, RAW);
+    const rations = index.byUuid.get("Compendium.pf2e.equipment-srd.Item.ddd");
+    expect(rations?.tags).toEqual([]);
+    expect(rations?.joinedBy).toBeNull();
+    // ...and they stay out of the inverted tag index entirely.
+    expect(index.tagToItemIds.get("Damage")).toEqual([
+      "Compendium.pf2e.equipment-srd.Item.aaa",
+    ]);
   });
 });
 

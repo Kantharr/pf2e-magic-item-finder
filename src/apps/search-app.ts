@@ -40,16 +40,28 @@ const SEARCH_DEBOUNCE_MS = 250;
 /** Canonical PF2e rarity order for the rarity chip row. */
 const RARITY_ORDER = ["common", "uncommon", "rare", "unique"] as const;
 
+/** Chip labels for the magic axis, keyed by filter value (mirrors HANDS_LABELS). */
+const MAGIC_LABELS: Record<string, { key: string; fallback: string }> = {
+  magical: { key: "PF2E_ITEM_FINDER.Filter.MagicMagical", fallback: "Magical" },
+  mundane: { key: "PF2E_ITEM_FINDER.Filter.MagicMundane", fallback: "Non-magical" },
+};
+
 /** Hand-count value → its localization key + English fallback label. */
 const HANDS_LABELS: Record<string, { key: string; fallback: string }> = {
-  "1": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1", fallback: "1 hand" },
-  "1+": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands1Plus", fallback: "1+ hands" },
-  "2": { key: "PF2E_MAGIC_ITEM_FINDER.Filter.Hands2", fallback: "2 hands" },
+  "1": { key: "PF2E_ITEM_FINDER.Filter.Hands1", fallback: "1 hand" },
+  "1+": { key: "PF2E_ITEM_FINDER.Filter.Hands1Plus", fallback: "1+ hands" },
+  "2": { key: "PF2E_ITEM_FINDER.Filter.Hands2", fallback: "2 hands" },
 };
 
 /** Display label for a weapon hand count, falling back to the raw value. */
 function handsLabel(value: string): string {
   const entry = HANDS_LABELS[value];
+  return entry ? t(entry.key, entry.fallback) : value;
+}
+
+/** Localized label for a magic-axis value ("magical" → "Magical"). */
+function magicLabel(value: string): string {
+  const entry = MAGIC_LABELS[value];
   return entry ? t(entry.key, entry.fallback) : value;
 }
 
@@ -157,7 +169,7 @@ async function promptForText(title: string, okLabel: string, initial: string): P
         },
         cancel: {
           icon: '<i class="fa-solid fa-xmark"></i>',
-          label: t("PF2E_MAGIC_ITEM_FINDER.Preset.Cancel", "Cancel"),
+          label: t("PF2E_ITEM_FINDER.Preset.Cancel", "Cancel"),
           callback: () => done(null),
         },
       },
@@ -220,37 +232,38 @@ interface DetailVM {
  * part (keeping the search box focused); selecting a row re-renders only the
  * detail part. Rows open their item sheet and drag onto sheets/canvas.
  */
-export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class ItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
   static override DEFAULT_OPTIONS = {
     id: MODULE_ID,
     classes: [MODULE_ID],
     tag: "div",
     window: {
-      title: "PF2E_MAGIC_ITEM_FINDER.App.Title",
+      title: "PF2E_ITEM_FINDER.App.Title",
       icon: "fa-solid fa-wand-magic-sparkles",
       resizable: true,
     },
     position: { width: 1040, height: 700 },
     actions: {
-      toggleTag: MagicItemFinderApp.#onToggleTag,
-      toggleRarity: MagicItemFinderApp.#onToggleRarity,
-      toggleTrait: MagicItemFinderApp.#onToggleTrait,
-      toggleWeaponGroup: MagicItemFinderApp.#onToggleWeaponGroup,
-      toggleArmorCategory: MagicItemFinderApp.#onToggleArmorCategory,
-      toggleHands: MagicItemFinderApp.#onToggleHands,
-      sortColumn: MagicItemFinderApp.#onSortColumn,
-      clearFilters: MagicItemFinderApp.#onClearFilters,
-      selectItem: MagicItemFinderApp.#onSelectItem,
-      openItem: MagicItemFinderApp.#onOpenItem,
-      firstPage: MagicItemFinderApp.#onFirstPage,
-      prevPage: MagicItemFinderApp.#onPrevPage,
-      nextPage: MagicItemFinderApp.#onNextPage,
-      lastPage: MagicItemFinderApp.#onLastPage,
-      savePreset: MagicItemFinderApp.#onSavePreset,
-      renamePreset: MagicItemFinderApp.#onRenamePreset,
-      deletePreset: MagicItemFinderApp.#onDeletePreset,
-      exportCsv: MagicItemFinderApp.#onExportCsv,
-      exportJson: MagicItemFinderApp.#onExportJson,
+      toggleTag: ItemFinderApp.#onToggleTag,
+      toggleMagic: ItemFinderApp.#onToggleMagic,
+      toggleRarity: ItemFinderApp.#onToggleRarity,
+      toggleTrait: ItemFinderApp.#onToggleTrait,
+      toggleWeaponGroup: ItemFinderApp.#onToggleWeaponGroup,
+      toggleArmorCategory: ItemFinderApp.#onToggleArmorCategory,
+      toggleHands: ItemFinderApp.#onToggleHands,
+      sortColumn: ItemFinderApp.#onSortColumn,
+      clearFilters: ItemFinderApp.#onClearFilters,
+      selectItem: ItemFinderApp.#onSelectItem,
+      openItem: ItemFinderApp.#onOpenItem,
+      firstPage: ItemFinderApp.#onFirstPage,
+      prevPage: ItemFinderApp.#onPrevPage,
+      nextPage: ItemFinderApp.#onNextPage,
+      lastPage: ItemFinderApp.#onLastPage,
+      savePreset: ItemFinderApp.#onSavePreset,
+      renamePreset: ItemFinderApp.#onRenamePreset,
+      deletePreset: ItemFinderApp.#onDeletePreset,
+      exportCsv: ItemFinderApp.#onExportCsv,
+      exportJson: ItemFinderApp.#onExportJson,
     },
   };
 
@@ -358,6 +371,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
   /** Build the sidebar's option lists + active-selection flags. */
   #sidebarContext(options: FilterOptionLists): object {
     const selTags = new Set(this.#filter.tags ?? []);
+    const selMagic = new Set(this.#filter.magic ?? []);
     const selRarities = new Set(this.#filter.rarities ?? []);
     const selTraits = new Set(this.#filter.traits ?? []);
     const selWeaponGroups = new Set(this.#filter.weaponGroups ?? []);
@@ -370,6 +384,13 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       hasPresets: presets.length > 0,
       hasActivePreset: hasActive,
       tags: options.tags.map((t) => ({ ...t, active: selTags.has(t.name) })),
+      magic: options.magic.map((m) => ({
+        value: m,
+        label: magicLabel(m),
+        active: selMagic.has(m),
+      })),
+      // A single-valued axis can only ever be a no-op, so don't render it.
+      hasMagic: options.magic.length > 1,
       rarities: RARITY_ORDER.filter((r) => options.rarities.includes(r)).map((r) => ({
         value: r,
         label: titleCase(r),
@@ -512,7 +533,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     const engine = currentEngine();
     if (!engine || engine.hasDescriptions || this.#descriptionLoad) return;
     ui.notifications?.info(
-      t("PF2E_MAGIC_ITEM_FINDER.Filter.LoadingDescriptions", "Loading item descriptions…"),
+      t("PF2E_ITEM_FINDER.Filter.LoadingDescriptions", "Loading item descriptions…"),
     );
     this.#requeryWhenDescriptionsReady();
   }
@@ -566,7 +587,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       console.error(`${MODULE_ID} | failed to load item descriptions`, err);
       ui.notifications?.error(
         t(
-          "PF2E_MAGIC_ITEM_FINDER.Filter.DescriptionsFailed",
+          "PF2E_ITEM_FINDER.Filter.DescriptionsFailed",
           "Could not load item descriptions; search will match item names only.",
         ),
       );
@@ -813,7 +834,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   // ---- click actions (framework-delegated) ---------------------------------
 
-  static #onToggleTag(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleTag(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const tag = target.dataset.tag;
     if (!tag) return;
     const set = new Set(this.#filter.tags ?? []);
@@ -825,7 +846,19 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onToggleRarity(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleMagic(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
+    const magic = target.dataset.magic;
+    if (!magic) return;
+    const set = new Set(this.#filter.magic ?? []);
+    if (set.has(magic)) set.delete(magic);
+    else set.add(magic);
+    this.#filter.magic = set.size ? [...set] : undefined;
+    target.classList.toggle("active", set.has(magic));
+    target.setAttribute("aria-pressed", String(set.has(magic)));
+    this.#markDirtyAndRenderResults();
+  }
+
+  static #onToggleRarity(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const rarity = target.dataset.rarity;
     if (!rarity) return;
     const set = new Set(this.#filter.rarities ?? []);
@@ -837,7 +870,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onToggleTrait(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleTrait(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const trait = target.dataset.trait;
     if (!trait) return;
     const set = new Set(this.#filter.traits ?? []);
@@ -849,7 +882,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onToggleWeaponGroup(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleWeaponGroup(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const group = target.dataset.group;
     if (!group) return;
     const set = new Set(this.#filter.weaponGroups ?? []);
@@ -861,7 +894,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onToggleArmorCategory(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleArmorCategory(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const category = target.dataset.category;
     if (!category) return;
     const set = new Set(this.#filter.armorCategories ?? []);
@@ -875,7 +908,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   /** Click a results column header: sort by it (asc), or flip direction if it is
    * already the active sort field. */
-  static #onToggleHands(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onToggleHands(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const hands = target.dataset.hands;
     if (!hands) return;
     const set = new Set(this.#filter.hands ?? []);
@@ -887,7 +920,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onSortColumn(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onSortColumn(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const field = target.dataset.sort as SortField | undefined;
     if (field !== "name" && field !== "level" && field !== "price") return;
     const active: SortField = this.#effectiveSort();
@@ -900,7 +933,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     this.#markDirtyAndRenderResults();
   }
 
-  static #onClearFilters(this: MagicItemFinderApp): void {
+  static #onClearFilters(this: ItemFinderApp): void {
     this.#filter = {};
     this.#selectedUuid = null;
     this.#activePreset = null;
@@ -935,10 +968,10 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     void this.render({ parts: ["sidebar", "results", "detail"] });
   }
 
-  static async #onSavePreset(this: MagicItemFinderApp): Promise<void> {
+  static async #onSavePreset(this: ItemFinderApp): Promise<void> {
     const name = await promptForText(
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.SaveTitle", "Save preset"),
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.Save", "Save"),
+      t("PF2E_ITEM_FINDER.Preset.SaveTitle", "Save preset"),
+      t("PF2E_ITEM_FINDER.Preset.Save", "Save"),
       this.#activePreset ?? "",
     );
     if (name == null) return;
@@ -946,7 +979,7 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
       const saved = await savePreset(name, this.#filter);
       this.#activePreset = saved.name;
       ui.notifications?.info(
-        t("PF2E_MAGIC_ITEM_FINDER.Preset.Saved", `Preset "${saved.name}" saved.`, { name: saved.name }),
+        t("PF2E_ITEM_FINDER.Preset.Saved", `Preset "${saved.name}" saved.`, { name: saved.name }),
       );
       void this.render({ parts: ["sidebar"] });
     } catch (err) {
@@ -954,15 +987,15 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     }
   }
 
-  static async #onRenamePreset(this: MagicItemFinderApp): Promise<void> {
+  static async #onRenamePreset(this: ItemFinderApp): Promise<void> {
     if (!this.#activePreset) {
-      ui.notifications?.warn(t("PF2E_MAGIC_ITEM_FINDER.Preset.SelectFirst", "Select a preset first."));
+      ui.notifications?.warn(t("PF2E_ITEM_FINDER.Preset.SelectFirst", "Select a preset first."));
       return;
     }
     const from = this.#activePreset;
     const name = await promptForText(
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.RenameTitle", "Rename preset"),
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.Rename", "Rename"),
+      t("PF2E_ITEM_FINDER.Preset.RenameTitle", "Rename preset"),
+      t("PF2E_ITEM_FINDER.Preset.Rename", "Rename"),
       from,
     );
     if (name == null) return;
@@ -975,15 +1008,15 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     }
   }
 
-  static async #onDeletePreset(this: MagicItemFinderApp): Promise<void> {
+  static async #onDeletePreset(this: ItemFinderApp): Promise<void> {
     if (!this.#activePreset) {
-      ui.notifications?.warn(t("PF2E_MAGIC_ITEM_FINDER.Preset.SelectFirst", "Select a preset first."));
+      ui.notifications?.warn(t("PF2E_ITEM_FINDER.Preset.SelectFirst", "Select a preset first."));
       return;
     }
     const name = this.#activePreset;
     const ok = await confirmDialog(
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.DeleteTitle", "Delete preset"),
-      t("PF2E_MAGIC_ITEM_FINDER.Preset.DeleteConfirm", `Delete the preset "${name}"?`, { name }),
+      t("PF2E_ITEM_FINDER.Preset.DeleteTitle", "Delete preset"),
+      t("PF2E_ITEM_FINDER.Preset.DeleteConfirm", `Delete the preset "${name}"?`, { name }),
     );
     if (!ok) return;
     await deletePreset(name);
@@ -995,11 +1028,11 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   // ---- export --------------------------------------------------------------
 
-  static #onExportCsv(this: MagicItemFinderApp): void {
+  static #onExportCsv(this: ItemFinderApp): void {
     this.#export("csv");
   }
 
-  static #onExportJson(this: MagicItemFinderApp): void {
+  static #onExportJson(this: ItemFinderApp): void {
     this.#export("json");
   }
 
@@ -1010,23 +1043,23 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
     // No limit: the full filtered set, not the DOM-capped view.
     const items = engine.query(this.#filter).items;
     if (items.length === 0) {
-      ui.notifications?.warn(t("PF2E_MAGIC_ITEM_FINDER.Export.Empty", "Nothing to export."));
+      ui.notifications?.warn(t("PF2E_ITEM_FINDER.Export.Empty", "Nothing to export."));
       return;
     }
     const rows = buildExportRows(items);
     if (kind === "csv") downloadCsv(rows);
     else downloadJson(rows);
     ui.notifications?.info(
-      t("PF2E_MAGIC_ITEM_FINDER.Export.Done", `Exported ${rows.length} items.`, { count: rows.length }),
+      t("PF2E_ITEM_FINDER.Export.Done", `Exported ${rows.length} items.`, { count: rows.length }),
     );
   }
 
-  static #onSelectItem(this: MagicItemFinderApp, _event: Event, target: HTMLElement): void {
+  static #onSelectItem(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
     const uuid = target.closest<HTMLElement>("[data-uuid]")?.dataset.uuid;
     if (uuid) this.#select(uuid);
   }
 
-  static #onOpenItem(this: MagicItemFinderApp, event: Event, target: HTMLElement): void {
+  static #onOpenItem(this: ItemFinderApp, event: Event, target: HTMLElement): void {
     event.stopPropagation();
     const uuid = target.closest<HTMLElement>("[data-uuid]")?.dataset.uuid;
     if (uuid) void this.#openSheet(uuid);
@@ -1034,19 +1067,19 @@ export class MagicItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2
 
   // ---- pagination ------------------------------------------------------------
 
-  static #onFirstPage(this: MagicItemFinderApp): void {
+  static #onFirstPage(this: ItemFinderApp): void {
     this.#goToPage(0);
   }
 
-  static #onPrevPage(this: MagicItemFinderApp): void {
+  static #onPrevPage(this: ItemFinderApp): void {
     this.#goToPage(this.#page - 1);
   }
 
-  static #onNextPage(this: MagicItemFinderApp): void {
+  static #onNextPage(this: ItemFinderApp): void {
     this.#goToPage(this.#page + 1);
   }
 
-  static #onLastPage(this: MagicItemFinderApp): void {
+  static #onLastPage(this: ItemFinderApp): void {
     this.#goToPage(this.#maxPage(this.#lastResult.total));
   }
 }

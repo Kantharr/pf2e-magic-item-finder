@@ -1,6 +1,6 @@
 import MiniSearch from "minisearch";
 import { MODULE_ID, REQUIRED_SYSTEM_ID } from "./constants.js";
-import { MagicItemFinderApp } from "./apps/search-app.js";
+import { ItemFinderApp } from "./apps/search-app.js";
 import { loadTagMap, warnOnSystemVersionMismatch, type TagMap } from "./data/tag-map.js";
 import { computeCoverage, logCoverage, type CoverageReport } from "./data/coverage.js";
 import {
@@ -15,7 +15,7 @@ import { registerPresetSetting } from "./data/presets.js";
 
 /** Public API hung off the module entry so macros/other code can open the app. */
 interface ModuleApi {
-  open: () => MagicItemFinderApp;
+  open: () => ItemFinderApp;
   MiniSearch: typeof MiniSearch;
   /** The parsed tag map (uuid → tags/snippets/method + category dictionary). */
   tagMap: TagMap | null;
@@ -36,7 +36,7 @@ interface ModuleApi {
   fetchDescription: (uuid: string) => Promise<string | null>;
 }
 
-let appInstance: MagicItemFinderApp | null = null;
+let appInstance: ItemFinderApp | null = null;
 
 /** Populated at `ready`; also mirrored onto the module API for the index to join on. */
 let tagMap: TagMap | null = null;
@@ -61,13 +61,13 @@ function publishData(map: TagMap | null, coverage: CoverageReport | null): void 
 }
 
 /** Open (or focus) the search window. */
-function openSearchApp(): MagicItemFinderApp {
+function openSearchApp(): ItemFinderApp {
   if (game.system?.id !== REQUIRED_SYSTEM_ID) {
     ui.notifications?.warn(
-      game.i18n?.localize("PF2E_MAGIC_ITEM_FINDER.Notify.WrongSystem") ?? "",
+      game.i18n?.localize("PF2E_ITEM_FINDER.Notify.WrongSystem") ?? "",
     );
   }
-  appInstance ??= new MagicItemFinderApp();
+  appInstance ??= new ItemFinderApp();
   void appInstance.render({ force: true });
   return appInstance;
 }
@@ -77,8 +77,8 @@ Hooks.once("init", () => {
 
   // Placeholder client-scoped setting; presets (Phase 6) extend this namespace.
   game.settings?.register(MODULE_ID, "debugLogging", {
-    name: "PF2E_MAGIC_ITEM_FINDER.Settings.DebugLogging.Name",
-    hint: "PF2E_MAGIC_ITEM_FINDER.Settings.DebugLogging.Hint",
+    name: "PF2E_ITEM_FINDER.Settings.DebugLogging.Name",
+    hint: "PF2E_ITEM_FINDER.Settings.DebugLogging.Hint",
     scope: "client",
     config: true,
     type: Boolean,
@@ -223,7 +223,7 @@ function injectCompendiumButton(app: unknown, html: unknown): void {
     // `<button class="inline-control filter …">` on v13+.
     const filterCtrl = headerSearch.querySelector<HTMLElement>("i.filter, button.filter");
     const tooltip =
-      game.i18n?.localize("PF2E_MAGIC_ITEM_FINDER.Control.Open") ?? "Magic Item Finder";
+      game.i18n?.localize("PF2E_ITEM_FINDER.Control.Open") ?? "Item Finder";
 
     let btn: HTMLElement;
     if (filterCtrl?.tagName === "BUTTON") {

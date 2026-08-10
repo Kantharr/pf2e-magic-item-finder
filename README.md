@@ -1,18 +1,22 @@
-# PF2e Magic Item Finder (FoundryVTT module)
+# PF2e Item Finder (FoundryVTT module)
 
 A standalone FoundryVTT window (Pathfinder Second Edition system) for searching
-magic items by **ability tag** — *fly, heal, teleport, invisibility…* — plus
+equipment by **ability tag** — *fly, heal, teleport, invisibility…* — plus
 full-text description search, level/rarity/trait/price filters, saved presets, and
 CSV/JSON export.
 
 It reads the **live** `pf2e.equipment-srd` compendium for item data and joins it to
-a **bundled, pre-computed ability-tag map**. An item counts as magical if it carries
-a marker trait (`magical`, `arcane`, `divine`, `occult`, `primal`, `artifact`) **or**
-any etched rune — the remaster strips the `magical` trait from *specific* magic
-items like *Iris of the Sky*, which are recognizable only by their runes. The
-result is the one thing the PF2e
+a **bundled, pre-computed ability-tag map**. The result is the one thing the PF2e
 system's native Compendium Browser can't do: *"show me every item that lets a
 character fly / heal an ally / teleport."*
+
+**Magical and mundane items are both searchable**, and the window shows both by
+default. A **Magic** filter narrows to one or the other when you want just the
+enchanted gear, or just the ordinary kind. An item counts as magical if it carries
+a marker trait (`magical`, `arcane`, `divine`, `occult`, `primal`, `artifact`) **or**
+any etched rune — the remaster strips the `magical` trait from *specific* magic
+items like *Iris of the Sky*, which are recognizable only by their runes. Only
+magical items carry ability tags, so picking any tag narrows to them on its own.
 
 ## Requirements
 
@@ -30,7 +34,7 @@ item data and one-click, auto-updating installs.
 https://github.com/Kantharr/pf2e-magic-item-finder/releases/latest/download/module.json
 ```
 
-Then enable **PF2e Magic Item Finder** in your PF2e world (*Game Settings →
+Then enable **PF2e Item Finder** in your PF2e world (*Game Settings →
 Manage Modules*). If the module doesn't appear immediately after install, fully
 restart the Foundry server so it re-scans the modules folder.
 

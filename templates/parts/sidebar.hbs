@@ -3,15 +3,15 @@
   <div class="pf2e-mif-search">
     <i class="fa-solid fa-magnifying-glass"></i>
     <input type="search" data-filter="text" value="{{sidebar.text}}"
-           placeholder="{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.SearchPlaceholder"}}"
-           aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Search"}}" />
+           placeholder="{{localize "PF2E_ITEM_FINDER.Filter.SearchPlaceholder"}}"
+           aria-label="{{localize "PF2E_ITEM_FINDER.Filter.Search"}}" />
   </div>
-  <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.SearchHint"}}</p>
+  <p class="pf2e-mif-hint">{{localize "PF2E_ITEM_FINDER.Filter.SearchHint"}}</p>
   {{!-- Ability-tag chips: the headline filter, first + most prominent.
         Bounded, scrollable box (like the traits list) so a long dictionary
         doesn't push the rest of the sidebar off-screen. --}}
   <section class="pf2e-mif-filter pf2e-mif-tags">
-    <h3><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Filter.AbilityTags"}}</h3>
+    <h3><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "PF2E_ITEM_FINDER.Filter.AbilityTags"}}</h3>
     <div class="pf2e-mif-scrollbox pf2e-mif-tags-box">
       <div class="pf2e-mif-chips">
         {{#each sidebar.tags}}
@@ -25,8 +25,25 @@
     </div>
   </section>
 
+  {{!-- Magic: the broadest cut of the corpus, so it sits directly under the
+        ability tags. Neither chip selected = both kinds, the default view. --}}
+  {{#if sidebar.hasMagic}}
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Rarity"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Magic"}}</h3>
+    <div class="pf2e-mif-chips">
+      {{#each sidebar.magic}}
+      <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
+              data-action="toggleMagic" data-magic="{{value}}" aria-pressed="{{active}}">
+        {{label}}
+      </button>
+      {{/each}}
+    </div>
+    <p class="pf2e-mif-hint">{{localize "PF2E_ITEM_FINDER.Filter.MagicHint"}}</p>
+  </section>
+  {{/if}}
+
+  <section class="pf2e-mif-filter">
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Rarity"}}</h3>
     <div class="pf2e-mif-chips">
       {{#each sidebar.rarities}}
       <button type="button" class="pf2e-mif-chip rarity-{{value}}{{#if active}} active{{/if}}"
@@ -38,7 +55,7 @@
   </section>
 
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Level"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Level"}}</h3>
     <div class="pf2e-mif-range">
       <input type="number" data-filter="minLevel" value="{{sidebar.minLevel}}"
              min="{{sidebar.levelRange.min}}" max="{{sidebar.levelRange.max}}"
@@ -52,7 +69,7 @@
 
   {{#if sidebar.priceRange}}
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Price"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Price"}}</h3>
     <div class="pf2e-mif-range">
       <input type="number" data-filter="minPriceGp" value="{{sidebar.minPriceGp}}" min="0"
              placeholder="0" aria-label="Min price (gp)" />
@@ -62,13 +79,13 @@
     </div>
     <label class="pf2e-mif-check">
       <input type="checkbox" data-filter="includePriceless" {{#if sidebar.includePriceless}}checked{{/if}} />
-      {{localize "PF2E_MAGIC_ITEM_FINDER.Filter.IncludePriceless"}}
+      {{localize "PF2E_ITEM_FINDER.Filter.IncludePriceless"}}
     </label>
   </section>
   {{/if}}
 
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Traits"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Traits"}}</h3>
     <div class="pf2e-mif-scrollbox pf2e-mif-traits-box">
       <div class="pf2e-mif-chips">
         {{#each sidebar.traits}}
@@ -79,12 +96,12 @@
         {{/each}}
       </div>
     </div>
-    <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.TraitsHint"}}</p>
+    <p class="pf2e-mif-hint">{{localize "PF2E_ITEM_FINDER.Filter.TraitsHint"}}</p>
   </section>
 
   {{#if sidebar.hasWeaponGroups}}
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.WeaponGroup"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.WeaponGroup"}}</h3>
     <div class="pf2e-mif-chips">
       {{#each sidebar.weaponGroups}}
       <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
@@ -98,7 +115,7 @@
 
   {{#if sidebar.hasHands}}
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Hands"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Hands"}}</h3>
     <div class="pf2e-mif-chips">
       {{#each sidebar.hands}}
       <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
@@ -107,13 +124,13 @@
       </button>
       {{/each}}
     </div>
-    <p class="pf2e-mif-hint">{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.HandsHint"}}</p>
+    <p class="pf2e-mif-hint">{{localize "PF2E_ITEM_FINDER.Filter.HandsHint"}}</p>
   </section>
   {{/if}}
 
   {{#if sidebar.hasArmorCategories}}
   <section class="pf2e-mif-filter">
-    <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Filter.ArmorCategory"}}</h3>
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.ArmorCategory"}}</h3>
     <div class="pf2e-mif-chips">
       {{#each sidebar.armorCategories}}
       <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
@@ -128,35 +145,35 @@
   <div class="pf2e-mif-sidebar-footer">
     {{!-- Presets: apply from the dropdown; save/rename/delete the current state. --}}
     <section class="pf2e-mif-presets">
-      <h3>{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.Presets"}}</h3>
-      <select data-preset="select" aria-label="{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.Apply"}}">
-        <option value="">{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.Placeholder"}}</option>
+      <h3>{{localize "PF2E_ITEM_FINDER.Preset.Presets"}}</h3>
+      <select data-preset="select" aria-label="{{localize "PF2E_ITEM_FINDER.Preset.Apply"}}">
+        <option value="">{{localize "PF2E_ITEM_FINDER.Preset.Placeholder"}}</option>
         {{#each sidebar.presets}}
         <option value="{{name}}"{{#if selected}} selected{{/if}}>{{name}}</option>
         {{/each}}
       </select>
       <div class="pf2e-mif-preset-actions">
         <button type="button" data-action="savePreset"
-                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.SaveTip"}}">
-          <i class="fa-solid fa-floppy-disk"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Preset.Save"}}
+                data-tooltip="{{localize "PF2E_ITEM_FINDER.Preset.SaveTip"}}">
+          <i class="fa-solid fa-floppy-disk"></i> {{localize "PF2E_ITEM_FINDER.Preset.Save"}}
         </button>
         <button type="button" data-action="renamePreset" {{#unless sidebar.hasActivePreset}}disabled{{/unless}}
-                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.RenameTip"}}">
+                data-tooltip="{{localize "PF2E_ITEM_FINDER.Preset.RenameTip"}}">
           <i class="fa-solid fa-pen"></i>
         </button>
         <button type="button" class="pf2e-mif-preset-delete" data-action="deletePreset"
                 {{#unless sidebar.hasActivePreset}}disabled{{/unless}}
-                data-tooltip="{{localize "PF2E_MAGIC_ITEM_FINDER.Preset.DeleteTip"}}">
+                data-tooltip="{{localize "PF2E_ITEM_FINDER.Preset.DeleteTip"}}">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
     </section>
 
     <button type="button" class="pf2e-mif-clear" data-action="clearFilters">
-      <i class="fa-solid fa-eraser"></i> {{localize "PF2E_MAGIC_ITEM_FINDER.Filter.Clear"}}
+      <i class="fa-solid fa-eraser"></i> {{localize "PF2E_ITEM_FINDER.Filter.Clear"}}
     </button>
   </div>
   {{else}}
-  <p class="pf2e-mif-loading">{{localize "PF2E_MAGIC_ITEM_FINDER.App.Loading"}}</p>
+  <p class="pf2e-mif-loading">{{localize "PF2E_ITEM_FINDER.App.Loading"}}</p>
   {{/if}}
 </aside>
