@@ -53,9 +53,26 @@ const HANDS_LABELS: Record<string, { key: string; fallback: string }> = {
   "2": { key: "PF2E_ITEM_FINDER.Filter.Hands2", fallback: "2 hands" },
 };
 
+/** Rune family → its localization key + English fallback label. */
+const RUNE_KIND_LABELS: Record<string, { key: string; fallback: string }> = {
+  accessory: { key: "PF2E_ITEM_FINDER.Filter.RuneAccessory", fallback: "Accessory" },
+  "armor-property": { key: "PF2E_ITEM_FINDER.Filter.RuneArmorProperty", fallback: "Armor property" },
+  "clan-dagger": { key: "PF2E_ITEM_FINDER.Filter.RuneClanDagger", fallback: "Clan dagger filigree" },
+  "fundamental-armor": { key: "PF2E_ITEM_FINDER.Filter.RuneFundamentalArmor", fallback: "Fundamental armor" },
+  "fundamental-weapon": { key: "PF2E_ITEM_FINDER.Filter.RuneFundamentalWeapon", fallback: "Fundamental weapon" },
+  shield: { key: "PF2E_ITEM_FINDER.Filter.RuneShield", fallback: "Shield" },
+  "weapon-property": { key: "PF2E_ITEM_FINDER.Filter.RuneWeaponProperty", fallback: "Weapon property" },
+};
+
 /** Display label for a weapon hand count, falling back to the raw value. */
 function handsLabel(value: string): string {
   const entry = HANDS_LABELS[value];
+  return entry ? t(entry.key, entry.fallback) : value;
+}
+
+/** Localized label for a rune family ("shield" → "Shield"). */
+function runeKindLabel(value: string): string {
+  const entry = RUNE_KIND_LABELS[value];
   return entry ? t(entry.key, entry.fallback) : value;
 }
 
@@ -250,6 +267,7 @@ export class ItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
       toggleTrait: ItemFinderApp.#onToggleTrait,
       toggleWeaponGroup: ItemFinderApp.#onToggleWeaponGroup,
       toggleArmorCategory: ItemFinderApp.#onToggleArmorCategory,
+      toggleRuneKind: ItemFinderApp.#onToggleRuneKind,
       toggleHands: ItemFinderApp.#onToggleHands,
       sortColumn: ItemFinderApp.#onSortColumn,
       clearFilters: ItemFinderApp.#onClearFilters,
@@ -376,6 +394,7 @@ export class ItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const selTraits = new Set(this.#filter.traits ?? []);
     const selWeaponGroups = new Set(this.#filter.weaponGroups ?? []);
     const selArmorCategories = new Set(this.#filter.armorCategories ?? []);
+    const selRuneKinds = new Set(this.#filter.runeKinds ?? []);
     const selHands = new Set(this.#filter.hands ?? []);
     const presets = listPresets();
     const hasActive = this.#activePreset != null && presets.some((p) => p.name === this.#activePreset);
@@ -409,6 +428,12 @@ export class ItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
         active: selArmorCategories.has(c),
       })),
       hasArmorCategories: options.armorCategories.length > 0,
+      runeKinds: options.runeKinds.map((k) => ({
+        value: k,
+        label: runeKindLabel(k),
+        active: selRuneKinds.has(k),
+      })),
+      hasRuneKinds: options.runeKinds.length > 0,
       hands: options.hands.map((h) => ({
         value: h,
         label: handsLabel(h),
@@ -903,6 +928,18 @@ export class ItemFinderApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#filter.armorCategories = set.size ? [...set] : undefined;
     target.classList.toggle("active", set.has(category));
     target.setAttribute("aria-pressed", String(set.has(category)));
+    this.#markDirtyAndRenderResults();
+  }
+
+  static #onToggleRuneKind(this: ItemFinderApp, _event: Event, target: HTMLElement): void {
+    const kind = target.dataset.rune;
+    if (!kind) return;
+    const set = new Set(this.#filter.runeKinds ?? []);
+    if (set.has(kind)) set.delete(kind);
+    else set.add(kind);
+    this.#filter.runeKinds = set.size ? [...set] : undefined;
+    target.classList.toggle("active", set.has(kind));
+    target.setAttribute("aria-pressed", String(set.has(kind)));
     this.#markDirtyAndRenderResults();
   }
 

@@ -109,19 +109,20 @@ describe("assembleIndex", () => {
     { uuid: "Compendium.pf2e.equipment-srd.Item.bbb", id: "bbb", name: "Iris of the Sky", level: 6, rarity: "unique", traits: [], price: null, source: null, slug: "iris-of-the-sky", img: null, type: "weapon", category: "martial", group: "firearm", hands: "1" as const, magical: true },
     { uuid: "Compendium.pf2e.equipment-srd.Item.ccc", id: "ccc", name: "Longsword", level: 0, rarity: "common", traits: [], price: { gp: 1 }, source: null, slug: "longsword", img: null, type: "weapon", category: "martial", group: "sword", hands: "1" as const, magical: false },
     { uuid: "Compendium.pf2e.equipment-srd.Item.ddd", id: "ddd", name: "Rations", level: 0, rarity: "common", traits: [], price: { sp: 4 }, source: null, slug: "rations", img: null, type: "consumable", category: null, group: null, hands: null, magical: false },
+    { uuid: "Compendium.pf2e.equipment-srd.Item.eee", id: "eee", name: "Striking", level: 4, rarity: "common", traits: ["magical"], price: { gp: 65 }, source: null, slug: "striking", img: null, type: "equipment", category: null, group: null, hands: null, magical: true },
   ];
 
   it("indexes mundane items alongside magical ones, flagging each", () => {
     const index = assembleIndex(TAG_MAP, RAW);
-    expect(index.items).toHaveLength(4);
+    expect(index.items).toHaveLength(5);
     expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.aaa")?.magical).toBe(true);
     expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.ccc")?.magical).toBe(false);
   });
 
   it("splits the magical / mundane counts", () => {
     const { stats } = assembleIndex(TAG_MAP, RAW);
-    expect(stats.total).toBe(4);
-    expect(stats.magical).toBe(2);
+    expect(stats.total).toBe(5);
+    expect(stats.magical).toBe(3);
     expect(stats.mundane).toBe(2);
   });
 
@@ -130,7 +131,7 @@ describe("assembleIndex", () => {
     // One magical item joined; the other magical item did not. The two mundane
     // items have no map entry by construction and must not count as misses.
     expect(stats.matched).toBe(1);
-    expect(stats.unmatched).toBe(1);
+    expect(stats.unmatched).toBe(2);
     expect(stats.withTags).toBe(1);
   });
 
@@ -143,6 +144,15 @@ describe("assembleIndex", () => {
     expect(index.tagToItemIds.get("Damage")).toEqual([
       "Compendium.pf2e.equipment-srd.Item.aaa",
     ]);
+  });
+
+  it("classifies runes by slug, leaving everything else unclassified", () => {
+    const index = assembleIndex(TAG_MAP, RAW);
+    expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.eee")?.runeKind).toBe(
+      "fundamental-weapon",
+    );
+    expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.aaa")?.runeKind).toBeNull();
+    expect(index.byUuid.get("Compendium.pf2e.equipment-srd.Item.ddd")?.runeKind).toBeNull();
   });
 });
 

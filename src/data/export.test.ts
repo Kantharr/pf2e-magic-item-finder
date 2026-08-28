@@ -25,6 +25,7 @@ function makeItem(partial: Partial<IndexedItem> & { name: string }): IndexedItem
     category: null,
     group: null,
     hands: null,
+    runeKind: null,
     magical: partial.magical ?? true,
     tags: partial.tags ?? [],
     snippets: {},

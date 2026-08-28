@@ -142,6 +142,24 @@
   </section>
   {{/if}}
 
+  {{!-- Runes: the third member of the weapon-group/armor "item type" axis, so
+        picking a rune family alongside a weapon group widens rather than
+        narrows. --}}
+  {{#if sidebar.hasRuneKinds}}
+  <section class="pf2e-mif-filter">
+    <h3>{{localize "PF2E_ITEM_FINDER.Filter.Runes"}}</h3>
+    <div class="pf2e-mif-chips">
+      {{#each sidebar.runeKinds}}
+      <button type="button" class="pf2e-mif-chip{{#if active}} active{{/if}}"
+              data-action="toggleRuneKind" data-rune="{{value}}" aria-pressed="{{active}}">
+        {{label}}
+      </button>
+      {{/each}}
+    </div>
+    <p class="pf2e-mif-hint">{{localize "PF2E_ITEM_FINDER.Filter.RunesHint"}}</p>
+  </section>
+  {{/if}}
+
   <div class="pf2e-mif-sidebar-footer">
     {{!-- Presets: apply from the dropdown; save/rename/delete the current state. --}}
     <section class="pf2e-mif-presets">

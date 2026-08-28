@@ -7,6 +7,7 @@ import {
   isMagicalItem,
   type RawRunes,
 } from "./coverage.js";
+import { runeKind, type RuneKind } from "./runes.js";
 import type { MatchMethod, TagMap, TagMapEntry } from "./tag-map.js";
 
 /**
@@ -109,6 +110,9 @@ export interface IndexedItem {
   group: string | null;
   /** Hands the weapon occupies; `null` for non-weapons (see {@link weaponHands}). */
   hands: WeaponHands | null;
+  /** Which rune family the item belongs to, or `null` for non-runes — derived
+   * from {@link slug} via the bundled classification (see {@link runeKind}). */
+  runeKind: RuneKind | null;
   /**
    * Whether the item is magical per {@link isMagicalItem} (a marker trait *or* an
    * etched rune). Backs the `magic` filter axis. Mundane items never carry
@@ -331,6 +335,9 @@ export function assembleIndex(tagMap: TagMap, raw: RawItem[]): ItemIndex {
       category: r.category,
       group: r.group,
       hands: r.hands,
+      // Classified here rather than in the pack read so it stays pure and
+      // unit-testable: the slug is all it needs.
+      runeKind: runeKind(r.slug),
       magical: r.magical,
       tags,
       snippets: entry?.snippets ?? {},

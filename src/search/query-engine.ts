@@ -1,5 +1,6 @@
 import MiniSearch from "minisearch";
 import { WEAPON_HANDS_ORDER, type IndexedItem, type ItemIndex, type WeaponHands } from "../data/item-index.js";
+import { RUNE_KIND_ORDER, type RuneKind } from "../data/runes.js";
 
 /**
  * Phase 4 — the pure, UI-agnostic search/filter engine over the Phase 3 item
@@ -52,14 +53,17 @@ export interface FilterState {
   /** Selected trait slugs (OR within). Empty = any traits. */
   traits?: readonly string[];
   /**
-   * Selected weapon groups (sword, firearm…) and armor categories (light/medium/
-   * heavy). These two form a single "item type" axis: an item is kept if it
-   * matches *any* selected weapon group **or** *any* selected armor category
-   * (OR across both lists), so picking "firearm" + "light" shows firearms and
-   * light armor together. Empty on both sides = no type filter.
+   * Selected weapon groups (sword, firearm…), armor categories (light/medium/
+   * heavy), and rune families (see {@link import("../data/runes.js").RuneKind}).
+   * These three form a single "item type" axis: an item is kept if it matches
+   * *any* selected weapon group, *any* selected armor category, **or** *any*
+   * selected rune family (OR across all three lists), so picking "firearm" +
+   * "light" + "weapon-property" shows firearms, light armor, and weapon property
+   * runes together. Empty on all three = no type filter.
    */
   weaponGroups?: readonly string[];
   armorCategories?: readonly string[];
+  runeKinds?: readonly string[];
   /**
    * Selected weapon hand counts ("1", "1+", "2"; OR within). Its own AND axis,
    * *not* part of the weapon-group/armor OR axis: "two-handed swords" should
@@ -122,6 +126,8 @@ export interface FilterOptionLists {
   weaponGroups: string[];
   /** Distinct armor categories present among armor, in size order (light→heavy). */
   armorCategories: string[];
+  /** Rune families present in the corpus, in {@link RUNE_KIND_ORDER}. */
+  runeKinds: RuneKind[];
   /** Distinct weapon hand counts present, in canonical order (1 → 1+ → 2). */
   hands: WeaponHands[];
   /** Distinct rarities present, in canonical order (common→uncommon→rare→unique). */
@@ -473,15 +479,18 @@ function matchesStructured(item: IndexedItem, state: FilterState): boolean {
     if (!state.traits.some((t) => item.traits.includes(t))) return false;
   }
 
-  // Weapon group + armor category form one OR-combined "item type" axis.
+  // Weapon group + armor category + rune family form one OR-combined "item
+  // type" axis.
   const weaponGroups = state.weaponGroups ?? [];
   const armorCategories = state.armorCategories ?? [];
-  if (weaponGroups.length > 0 || armorCategories.length > 0) {
+  const runeKinds = state.runeKinds ?? [];
+  if (weaponGroups.length > 0 || armorCategories.length > 0 || runeKinds.length > 0) {
     const matchesWeapon =
       item.type === "weapon" && item.group != null && weaponGroups.includes(item.group);
     const matchesArmor =
       item.type === "armor" && item.category != null && armorCategories.includes(item.category);
-    if (!matchesWeapon && !matchesArmor) return false;
+    const matchesRune = item.runeKind != null && runeKinds.includes(item.runeKind);
+    if (!matchesWeapon && !matchesArmor && !matchesRune) return false;
   }
 
   if (state.hands && state.hands.length > 0) {
@@ -589,11 +598,15 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
   const weaponGroupSet = new Set<string>();
   const armorCategorySet = new Set<string>();
   const handsSet = new Set<WeaponHands>();
+  const runeKindSet = new Set<RuneKind>();
   for (const item of index.items) {
     if (item.type === "weapon" && item.group) weaponGroupSet.add(item.group);
     if (item.type === "armor" && item.category) armorCategorySet.add(item.category);
     if (item.hands) handsSet.add(item.hands);
+    if (item.runeKind) runeKindSet.add(item.runeKind);
   }
+  // Only the families the corpus actually contains, in canonical order.
+  const runeKinds = RUNE_KIND_ORDER.filter((k) => runeKindSet.has(k));
   const hands = WEAPON_HANDS_ORDER.filter((h) => handsSet.has(h));
   const weaponGroups = [...weaponGroupSet].sort((a, b) => a.localeCompare(b));
   const armorCategories: string[] = [];
@@ -627,5 +640,8 @@ function buildOptionLists(index: ItemIndex, categories?: readonly string[]): Fil
     : { min: 0, max: 0 };
   const priceRange = anyPriced ? { min: minPrice, max: maxPrice } : null;
 
-  return { tags, magic, traits, weaponGroups, armorCategories, hands, rarities, levelRange, priceRange };
+  return {
+    tags, magic, traits, weaponGroups, armorCategories, runeKinds, hands, rarities,
+    levelRange, priceRange,
+  };
 }

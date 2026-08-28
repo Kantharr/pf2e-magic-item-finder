@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { IndexedItem, ItemIndex, WeaponHands } from "../data/item-index.js";
+import type { RuneKind } from "../data/runes.js";
 import { createSearchEngine, parseQueryText, type FilterState } from "./query-engine.js";
 
 /**
@@ -26,6 +27,8 @@ interface ItemSpec {
   group?: string | null;
   /** Hands the weapon occupies ("1" / "1+" / "2"); non-weapons leave this null. */
   hands?: WeaponHands | null;
+  /** Rune family; non-runes (everything else) leave this null. */
+  runeKind?: RuneKind | null;
   /** Whether the item is magical. Defaults to true, so the pre-existing fixture
    * (all magic items) keeps its original meaning. */
   magical?: boolean;
@@ -49,6 +52,7 @@ function makeItem(spec: ItemSpec): IndexedItem {
     category: spec.category ?? null,
     group: spec.group ?? null,
     hands: spec.hands ?? null,
+    runeKind: spec.runeKind ?? null,
     magical: spec.magical ?? true,
     tags: spec.tags,
     snippets: {},
@@ -660,6 +664,69 @@ describe("weapon group / armor category filter", () => {
       .query({ weaponGroups: ["firearm"], rarities: ["unique"] })
       .items.map((i) => i.name);
     expect(names).toEqual(["Coldstar Pistols"]);
+  });
+});
+
+describe("rune family filter", () => {
+  const RUNES: ItemSpec[] = [
+    { name: "Striking", level: 4, rarity: "common", traits: ["magical"], priceGp: 65, tags: [], runeKind: "fundamental-weapon" },
+    { name: "Weapon Potency (+1)", level: 2, rarity: "common", traits: ["magical"], priceGp: 35, tags: [], runeKind: "fundamental-weapon" },
+    { name: "Flaming", level: 8, rarity: "common", traits: ["fire", "magical"], priceGp: 500, tags: [], runeKind: "weapon-property" },
+    { name: "Shadow", level: 5, rarity: "common", traits: ["magical"], priceGp: 55, tags: [], runeKind: "armor-property" },
+    { name: "Resilient", level: 8, rarity: "common", traits: ["magical"], priceGp: 340, tags: [], runeKind: "fundamental-armor" },
+    { name: "Reinforcing Rune (Minor)", level: 4, rarity: "common", traits: ["magical"], priceGp: 75, tags: [], runeKind: "shield" },
+    { name: "Bolka's Blessing", level: 5, rarity: "uncommon", traits: ["divine", "magical"], priceGp: 160, tags: [], runeKind: "clan-dagger" },
+    { name: "Presentable", level: 3, rarity: "common", traits: ["magical"], priceGp: 50, tags: [], runeKind: "accessory" },
+    { name: "Flaming Longsword", level: 8, rarity: "common", traits: ["magical"], priceGp: 200, tags: [], type: "weapon", category: "martial", group: "sword" },
+    { name: "Glamered Leather", level: 5, rarity: "common", traits: ["magical"], priceGp: 140, tags: [], type: "armor", category: "light", group: "leather" },
+  ];
+  const engine = createSearchEngine(makeIndex(RUNES));
+
+  it("offers only the families present, in canonical order", () => {
+    expect(engine.options.runeKinds).toEqual([
+      "accessory",
+      "armor-property",
+      "clan-dagger",
+      "fundamental-armor",
+      "fundamental-weapon",
+      "shield",
+      "weapon-property",
+    ]);
+  });
+
+  it("filters to one family", () => {
+    const names = engine.query({ runeKinds: ["clan-dagger"] }).items.map((i) => i.name);
+    expect(names).toEqual(["Bolka's Blessing"]);
+  });
+
+  it("ORs within a multi-family selection", () => {
+    const names = engine
+      .query({ runeKinds: ["shield", "fundamental-weapon"] })
+      .items.map((i) => i.name);
+    expect(names.sort()).toEqual([
+      "Reinforcing Rune (Minor)",
+      "Striking",
+      "Weapon Potency (+1)",
+    ]);
+  });
+
+  it("OR-combines with weapon groups and armor categories as one type axis", () => {
+    const names = engine
+      .query({ runeKinds: ["accessory"], weaponGroups: ["sword"], armorCategories: ["light"] })
+      .items.map((i) => i.name);
+    expect(names.sort()).toEqual(["Flaming Longsword", "Glamered Leather", "Presentable"]);
+  });
+
+  it("stays AND-intersected with the other categories", () => {
+    // Weapon property runes that also carry the fire trait → only Flaming.
+    const names = engine
+      .query({ runeKinds: ["weapon-property"], traits: ["fire"] })
+      .items.map((i) => i.name);
+    expect(names).toEqual(["Flaming"]);
+  });
+
+  it("treats an empty selection as no rune filter", () => {
+    expect(engine.query({ runeKinds: [] }).total).toBe(RUNES.length);
   });
 });
 

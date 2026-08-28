@@ -58,12 +58,15 @@ Then:
 - **Filter by ability tag** — pick one or more tag chips in the sidebar (OR within
   the group). This is the headline feature.
 - **Refine** with the supporting filters: free-text search, level range, rarity,
-  traits, price range, weapon group / armor category, and weapon hands — 1, 1+,
-  or 2 (`AND` across categories, `OR` within a multi-select). An
+  traits, price range, weapon group / armor category, rune family, and weapon
+  hands — 1, 1+, or 2 (`AND` across categories, `OR` within a multi-select). An
   `includePriceless` toggle brings priceless items back into a numeric price
-  range. Weapon group and armor category share one "item type" axis (picking
-  *firearm* + *light* shows both); hands is its own axis, so *2 hands* + *sword*
-  means two-handed swords.
+  range. Weapon group, armor category, and rune family share one "item type"
+  axis (picking *firearm* + *light* shows both); hands is its own axis, so
+  *2 hands* + *sword* means two-handed swords.
+- **Runes** get their own chip row, split the way the rules split them:
+  accessory, armor property, clan dagger filigree, fundamental armor,
+  fundamental weapon, shield, and weapon property.
 - **Free-text search covers names *and* description bodies**, so you can find
   "the item that grants fast healing" without knowing its name; name matches
   still rank first. Description text is pulled from the compendium once, when

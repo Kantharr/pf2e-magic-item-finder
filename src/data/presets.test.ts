@@ -17,6 +17,7 @@ const options: FilterOptionLists = {
   traits: ["fire", "invested", "magical"],
   weaponGroups: ["sword", "firearm", "bow"],
   armorCategories: ["light", "medium", "heavy"],
+  runeKinds: ["fundamental-weapon", "shield", "weapon-property"],
   hands: ["1", "1+", "2"],
   rarities: ["common", "uncommon", "rare"],
   levelRange: { min: 0, max: 20 },
@@ -71,6 +72,14 @@ describe("coerceAppliedState", () => {
     const out = coerceAppliedState(state, options);
     expect(out.weaponGroups).toEqual(["firearm"]);
     expect(out.armorCategories).toEqual(["light"]);
+  });
+
+  it("keeps/drops rune families against the option list", () => {
+    const state: FilterState = { runeKinds: ["shield", "chocolate"] };
+    expect(coerceAppliedState(state, options).runeKinds).toEqual(["shield"]);
+    // A preset saved before the rune axis existed carries no key at all, and
+    // widens to every family rather than matching none.
+    expect(coerceAppliedState({}, options).runeKinds).toBeUndefined();
   });
 
   it("collapses an entirely-unknown selection to undefined (not an empty array)", () => {
