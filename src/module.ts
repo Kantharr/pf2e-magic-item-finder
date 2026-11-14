@@ -126,7 +126,10 @@ Hooks.once("ready", () => {
 async function initTagData(): Promise<void> {
   try {
     tagMap = await loadTagMap();
-    warnOnSystemVersionMismatch(tagMap, game.system?.version, /* notify */ true);
+    // Console only: a version difference alone doesn't mean items fail to match
+    // (the coverage report below has the real numbers), so don't pop a UI notice
+    // at every user on every load.
+    warnOnSystemVersionMismatch(tagMap, game.system?.version);
     publishData(tagMap, null);
     console.log(
       `${MODULE_ID} | tag map loaded: ${tagMap.itemCount} items, ` +
